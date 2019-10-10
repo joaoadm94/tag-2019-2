@@ -17,6 +17,7 @@ typedef struct vertice {
     int grau;           // grau do vértice
     int grauEntrada;    // grau de entrada do vertices
     double coeficiente; // coeficiente de aglomeracao do vertice
+    int peso;           // peso associado as arestas que saem do vertice
     char *nome;         // referencia p/ o nome do vértice
     tAresta *aresta;    // referencia p/ a lista de arestas
     struct vertice *prox;     // referencia p/ o proximo vertice
@@ -95,7 +96,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
     return 0;
 }
 
-tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[]) {
+tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[], int peso) {
     tVertice *vertice;
 
     vertice = (tVertice*)malloc(sizeof(tVertice));
@@ -106,6 +107,7 @@ tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[]) {
         vertice->grauEntrada = 0;
         vertice->nome = rotulo;
         vertice->prox = NULL;
+        vertice->peso = peso;
     } else {
         printf("Não foi possível alocar memória para o vértice. Encerrando...");
         return NULL;
@@ -143,7 +145,7 @@ int criarAresta(tVertice *origem, tVertice *destino, int peso) {
     return 0;
 }
 
-int inserirAresta(int origem, int destino, int peso, int direcionado) {
+int inserirAresta(int origem, int destino, int direcionado) {
     tVertice *vertice, *verticeOrigem = NULL, *verticeDestino = NULL;
     int flagOrigem = 1, flagDestino = 1;
 
@@ -160,9 +162,9 @@ int inserirAresta(int origem, int destino, int peso, int direcionado) {
         vertice = vertice->prox;
     }
 
-    criarAresta(verticeOrigem, verticeDestino, peso);
+    criarAresta(verticeOrigem, verticeDestino, verticeOrigem->peso);
     if (direcionado == 0) {
-        criarAresta(verticeDestino, verticeOrigem, peso);
+        criarAresta(verticeDestino, verticeOrigem, verticeDestino->peso);
     } else {
         verticeDestino->grauEntrada++;
     }
@@ -194,24 +196,24 @@ int lerGrafo(FILE *arquivo) {
     if (rotulado) {
         auxVertice = NULL;
         fgets(linha, 20, arquivo);
-        sscanf(linha, "%d %s", &id, rotulo);
-        vertice = inserirVerticeRotulado(auxVertice, id, rotulo);
+        sscanf(linha, "%d %s %d", &id, rotulo, &peso);
+        vertice = inserirVerticeRotulado(auxVertice, id, rotulo, peso);
         grafo->vertice = vertice;
         auxVertice = vertice;
         qtdVertices--;
         while (qtdVertices > 0) {
             fgets(linha, 100, arquivo);
-            sscanf(linha, "%d %s", &id, rotulo);
-            vertice = inserirVerticeRotulado(auxVertice, id, rotulo);
+            sscanf(linha, "%d %s %d", &id, rotulo, &peso);
+            vertice = inserirVerticeRotulado(auxVertice, id, rotulo, peso);
             auxVertice = vertice;
             qtdVertices--;
         }
     }
 
     while (fgets(linha, 100, arquivo)) {
-        sscanf(linha, "%d %d %d", &origem, &destino, &peso);
+        sscanf(linha, "%d %d", &origem, &destino);
         //conferir peso
-        inserirAresta(origem, destino, peso, direcionado);
+        inserirAresta(origem, destino, direcionado);
     }
 
     free(linha);
