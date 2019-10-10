@@ -15,6 +15,7 @@ typedef struct aresta{
 typedef struct vertice {
     int id;             // id do vértice
     int grau;           // grau do vértice
+    int grauEntrada;    // grau de entrada do vertices
     double coeficiente; // coeficiente de aglomeracao do vertice
     char *nome;         // referencia p/ o nome do vértice
     tAresta *aresta;    // referencia p/ a lista de arestas
@@ -44,42 +45,49 @@ tNo *listaAdjacencias;    // referencia para a lista de adjacencias
 
 // --------------------- Funções ---------------------------
 
-int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotulos) {
+int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotulado) {
     tVertice *vertice, *auxVertice;
 
     grafo = (tGrafo*) malloc(sizeof(tGrafo));
     if (grafo) {
         grafo->qtdVertices = qtdVertices;
         grafo->qtdArestas = qtdArestas;
+        grafo->direcionado = direcionado;
+        grafo->vertice = NULL;
     } else {
         printf("Não foi possível alocar memória para o grafo. Encerrando...");
         return -1;
     }
 
-    if (qtdVertices > 0) {
-        auxVertice = (tVertice*)malloc(sizeof(tVertice));
-        if (auxVertice) {
-            auxVertice->id = 1;
-            auxVertice->aresta = NULL;
-            auxVertice->nome = NULL;
-            auxVertice->grau = 0;
-            grafo->vertice = auxVertice;
-        } else {
-            printf("Não foi possível alocar memória para o vértice. Encerrando...");
-            return -1;
-        }
-        for (int i = 2; i <= qtdVertices; i++) {
-            vertice = (tVertice*)malloc(sizeof(tVertice));
-            if (vertice) {
-                vertice->id = i;
+    if (!rotulado) {
+        printf("n rotulado");
+        if (qtdVertices > 0) {
+            auxVertice = (tVertice*)malloc(sizeof(tVertice));
+            if (auxVertice) {
+                auxVertice->id = 1;
                 auxVertice->aresta = NULL;
-                vertice->nome = NULL;
-                vertice->grau = 0;
-                auxVertice->prox = vertice;
-                auxVertice = vertice;    
+                auxVertice->nome = NULL;
+                auxVertice->grau = 0;
+                auxVertice->grauEntrada = 0;
+                grafo->vertice = auxVertice;
             } else {
                 printf("Não foi possível alocar memória para o vértice. Encerrando...");
                 return -1;
+            }
+            for (int i = 2; i <= qtdVertices; i++) {
+                vertice = (tVertice*)malloc(sizeof(tVertice));
+                if (vertice) {
+                    vertice->id = i;
+                    auxVertice->aresta = NULL;
+                    vertice->nome = NULL;
+                    vertice->grau = 0;
+                    vertice->grauEntrada = 0;
+                    auxVertice->prox = vertice;
+                    auxVertice = vertice;    
+                } else {
+                    printf("Não foi possível alocar memória para o vértice. Encerrando...");
+                    return -1;
+                }
             }
         }
     }
@@ -87,7 +95,29 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
     return 0;
 }
 
-int criarAresta(tVertice *origem, tVertice *destino) {
+tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[]) {
+    tVertice *vertice;
+
+    vertice = (tVertice*)malloc(sizeof(tVertice));
+    if (vertice) {
+        vertice->id = id;
+        vertice->aresta = NULL;
+        vertice->grau = 0;
+        vertice->grauEntrada = 0;
+        vertice->nome = rotulo;
+        vertice->prox = NULL;
+    } else {
+        printf("Não foi possível alocar memória para o vértice. Encerrando...");
+        return NULL;
+    }
+    if (anterior != NULL) {
+        anterior->prox = vertice;
+    }
+
+    return vertice;
+}
+
+int criarAresta(tVertice *origem, tVertice *destino, int peso) {
     tAresta *aresta, *novaAresta = (tAresta *) malloc(sizeof(tAresta));
     int flagAresta = 1;
     if (novaAresta == NULL) {
@@ -109,11 +139,11 @@ int criarAresta(tVertice *origem, tVertice *destino) {
         aresta->prox = novaAresta;
     }
     novaAresta->terminal = destino->id;
-    novaAresta->peso = 1;
+    novaAresta->peso = peso;
     return 0;
 }
 
-int inserirAresta(int origem, int destino) {
+int inserirAresta(int origem, int destino, int peso, int direcionado) {
     tVertice *vertice, *verticeOrigem = NULL, *verticeDestino = NULL;
     int flagOrigem = 1, flagDestino = 1;
 
@@ -130,16 +160,23 @@ int inserirAresta(int origem, int destino) {
         vertice = vertice->prox;
     }
 
-    criarAresta(verticeOrigem, verticeDestino);
-    criarAresta(verticeDestino, verticeOrigem);
+    criarAresta(verticeOrigem, verticeDestino, peso);
+    if (direcionado == 0) {
+        criarAresta(verticeDestino, verticeOrigem, peso);
+    } else {
+        verticeDestino->grauEntrada++;
+    }
 
     return 0;
 }
 
-int lerGrafo(tGrafo *grafo, FILE *arquivo) {
+int lerGrafo(FILE *arquivo) {
     char *linha = malloc(100);
     char *index;
-    int a, b, c, d, flag;
+    int qtdVertices, qtdArestas, direcionado, rotulado, id, flag;
+    int origem, destino, peso;
+    char rotulo[20] = ""; 
+    tVertice *vertice, *auxVertice;
 
     flag = 1;
 
@@ -147,17 +184,37 @@ int lerGrafo(tGrafo *grafo, FILE *arquivo) {
         index = linha;
         if (*index != '%') {
             flag = 0;
-            sscanf(linha, "%d %d %d %d", &a, &b, &c, &d);
-            if(inicializarGrafo(a, b, c, d) == -1) {
+            sscanf(linha, "%d %d %d %d", &qtdVertices, &qtdArestas, &direcionado, &rotulado);
+            if(inicializarGrafo(qtdVertices, qtdArestas, direcionado, rotulado) == -1) {
                 return -1;
             }
         }
     }
 
-    while (fgets(linha, 10, arquivo)) {
-        sscanf(linha, "%d %d", &a, &b);
-        inserirAresta(a, b);
+    if (rotulado) {
+        auxVertice = NULL;
+        fgets(linha, 20, arquivo);
+        sscanf(linha, "%d %s", &id, rotulo);
+        vertice = inserirVerticeRotulado(auxVertice, id, rotulo);
+        grafo->vertice = vertice;
+        auxVertice = vertice;
+        qtdVertices--;
+        while (qtdVertices > 0) {
+            fgets(linha, 100, arquivo);
+            sscanf(linha, "%d %s", &id, rotulo);
+            vertice = inserirVerticeRotulado(auxVertice, id, rotulo);
+            auxVertice = vertice;
+            qtdVertices--;
+        }
     }
+
+    while (fgets(linha, 100, arquivo)) {
+        sscanf(linha, "%d %d %d", &origem, &destino, &peso);
+        //conferir peso
+        inserirAresta(origem, destino, peso, direcionado);
+    }
+
+    imprimirVertices(grafo->vertice);
 
     free(linha);
     return 0;
@@ -223,21 +280,14 @@ int lerArquivo() {
     FILE *arquivo = fopen("curriculo.mtx", "r");
     int result;
 
-    if (arquivo == NULL)
-    {
+    if (arquivo == NULL) {
         printf("Não foi possível ler o arquivo \n");
         return -1;
     }
-    lerGrafo(grafo, arquivo);
-    // result = lerGrafo(grafo, arquivo);
+
+    lerGrafo(arquivo);
     fclose(arquivo);
     
-    // if (result == 0) {
-    //     printf("Arquivo lido com sucesso.\n");
-    // } else {
-    //     printf("Erro na leitura. Encerrando... \n");
-    //     return -1;
-    // }
     return 0;
 }
 
@@ -555,7 +605,9 @@ int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 2 ------\n");
     printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n\n");
     lerArquivo();
+    getchar();
     printf("Questão 1: imprimir os vértices e seus respectivos graus\n\n");
+    getchar();
     imprimirVertices(grafo->vertice);
     printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     imprimirCliques();
