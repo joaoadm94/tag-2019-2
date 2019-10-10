@@ -214,8 +214,6 @@ int lerGrafo(FILE *arquivo) {
         inserirAresta(origem, destino, peso, direcionado);
     }
 
-    imprimirVertices(grafo->vertice);
-
     free(linha);
     return 0;
 }
@@ -605,14 +603,11 @@ int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 2 ------\n");
     printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n\n");
     lerArquivo();
-    getchar();
-    printf("Questão 1: imprimir os vértices e seus respectivos graus\n\n");
-    getchar();
     imprimirVertices(grafo->vertice);
-    printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
-    imprimirCliques();
-    printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
-    obterCoeficienteAglomeracaoGrafo();
+    // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
+    // imprimirCliques();
+    // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
+    // obterCoeficienteAglomeracaoGrafo();
 
     printf("\nLiberando a memória alocada para o grafo...\n");
     liberarGrafo();
