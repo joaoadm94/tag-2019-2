@@ -519,13 +519,26 @@ int bronKerbosch(tVertice *r, tVertice *p, tVertice *x) {
 int depthFirstSearch(tVertice *vert) {
     tAresta *aresta;
     
-    aresta = vert->aresta;
-    while (aresta != NULL) {
-        depthFirstSearch(aresta->atalho);
-        aresta = aresta->prox;
+    if (vert->visitado == 0) {
+        vert->visitado = 1;
+        aresta = vert->aresta;
+        while (aresta != NULL) {
+            depthFirstSearch(aresta->atalho);
+            aresta = aresta->prox;
+        }
+        printf("%d ", vert->id);
     }
-    vert->visitado = 1;
-    printf("%d ", vert->id);
+    return 0;
+}
+
+int ordenacaoTopologica() {
+    tVertice *vertice = grafo->vertice;
+
+    while (vertice != NULL) {
+        depthFirstSearch(vertice);
+        vertice = vertice->prox;
+    }
+
     return 0;
 }
 
@@ -626,7 +639,7 @@ int main() {
     printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n\n");
     lerArquivo();
     imprimirVertices(grafo->vertice);
-    depthFirstSearch(grafo->vertice);
+    ordenacaoTopologica();
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
     // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
