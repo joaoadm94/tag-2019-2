@@ -6,9 +6,11 @@
 #include <string.h>
 
 // ----------------- Definições de tipos -------------------
+typedef struct vertice vertice;
 typedef struct aresta{
     int terminal;       // índice do vértice terminal
     int peso;           // peso ou valor da aresta, 0 = peso padrão
+    vertice *atalho;    //
     struct aresta *prox; // referencia para a prox aresta
 } tAresta;
 
@@ -19,6 +21,7 @@ typedef struct vertice {
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
     char *nome;         // referencia p/ o nome do vértice
+    int visitado;       //
     tAresta *aresta;    // referencia p/ a lista de arestas
     struct vertice *prox;     // referencia p/ o proximo vertice
 } tVertice;
@@ -70,6 +73,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
                 auxVertice->nome = NULL;
                 auxVertice->grau = 0;
                 auxVertice->grauEntrada = 0;
+                auxVertice->visitado = 0;
                 grafo->vertice = auxVertice;
             } else {
                 printf("Não foi possível alocar memória para o vértice. Encerrando...");
@@ -83,6 +87,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
                     vertice->nome = NULL;
                     vertice->grau = 0;
                     vertice->grauEntrada = 0;
+                    vertice->visitado = 0;
                     auxVertice->prox = vertice;
                     auxVertice = vertice;    
                 } else {
@@ -108,6 +113,7 @@ tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[], int 
         vertice->nome = rotulo;
         vertice->prox = NULL;
         vertice->peso = peso;
+        vertice->visitado = 0;
     } else {
         printf("Não foi possível alocar memória para o vértice. Encerrando...");
         return NULL;
@@ -142,6 +148,7 @@ int criarAresta(tVertice *origem, tVertice *destino, int peso) {
     }
     novaAresta->terminal = destino->id;
     novaAresta->peso = peso;
+    novaAresta->atalho = destino;
     return 0;
 }
 
@@ -317,7 +324,7 @@ void imprimirVertices(tVertice *vertice) {
                 }
             }
             vertice->grau = grau;
-            printf("Vértice %d - Grau %d\n", vertice->id, vertice->grau);
+            printf("Vértice %d - Grau %d - Entrada %d\n", vertice->id, vertice->grau, vertice->grauEntrada);
             if (vertice->prox == NULL) {
                 flagVertice = 0;
             } else {
@@ -509,6 +516,19 @@ int bronKerbosch(tVertice *r, tVertice *p, tVertice *x) {
     return 0;
 }
 
+int depthFirstSearch(tVertice *vert) {
+    tAresta *aresta;
+    
+    aresta = vert->aresta;
+    while (aresta != NULL) {
+        depthFirstSearch(aresta->atalho);
+        aresta = aresta->prox;
+    }
+    vert->visitado = 1;
+    printf("%d ", vert->id);
+    return 0;
+}
+
 // Função para imprimir todos os cliques maximais
 // por meio de um algoritmo Bron-Kerbosch
 int imprimirCliques() {
@@ -606,6 +626,7 @@ int main() {
     printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n\n");
     lerArquivo();
     imprimirVertices(grafo->vertice);
+    depthFirstSearch(grafo->vertice);
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
     // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
