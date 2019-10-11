@@ -636,7 +636,8 @@ void obterCoeficienteAglomeracaoGrafo() {
 // Funcao principal do programa
 int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 2 ------\n");
-    printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n\n");
+    printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n");
+    printf("---- Hiago (00/000000) ----\n\n");
     lerArquivo();
     imprimirVertices(grafo->vertice);
     ordenacaoTopologica();
