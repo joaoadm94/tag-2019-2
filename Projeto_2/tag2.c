@@ -1,9 +1,11 @@
 // Teoria e aplicação de grafos - Turma A - 2019/2
 // João Antonio Desiderio de Moraes (16/0126975)
+// Hiago dos Santos Rabelo (16/0124492)
  
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#define MAX(a, b) ((a)>(b)?(a):(b))
 
 // ----------------- Definições de tipos -------------------
 typedef struct vertice vertice;
@@ -18,11 +20,13 @@ typedef struct vertice {
     int id;             // id do vértice
     int grau;           // grau do vértice
     int grauEntrada;    // grau de entrada do vertices
+    int custoFinalizar; // maior custo para se chegar e finalizar esse vértice (dag)
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
     char *nome;         // referencia p/ o nome do vértice
     int visitado;       //
-    tAresta *aresta;    // referencia p/ a lista de arestas
+    tAresta *grafoAresta;    // referencia p/ a lista de arestas (grafo)
+    tAresta *CriticoAresta;  // referencia p/ lista de arestas (caminho crítico)
     struct vertice *prox;     // referencia p/ o proximo vertice
 } tVertice;
 
@@ -41,13 +45,31 @@ typedef struct no {
     struct no *prox;        // referencia para proximo no
 } tNo;                      // tnode = nó da estrutura da lista de adjacencias
 
+typedef struct NoOrdTop{
+    tVertice *vertice;
+    struct NoOrdTop *prox;
+}tNoOrdTop;
+
+typedef struct OrdenacaoTop{
+    tNoOrdTop *inicio;
+    tNoOrdTop *fim;
+}listaOrdenacaoTop;
+
 // ------------------ Variáveis globais --------------------
 
-tGrafo *grafo;             // referencia para um grafo
-tNo *listaAdjacencias;    // referencia para a lista de adjacencias
+tGrafo *grafo;                         // referencia para um grafo
+tNo *listaAdjacencias;                 // referencia para a lista de adjacencias
+listaOrdenacaoTop listaOrdTop; // referencia para a lista de adjacencias 
+                                       // ordenada topologicamente
+
 
 
 // --------------------- Funções ---------------------------
+
+void zeraListaOrdTop(){
+    listaOrdTop.inicio = NULL;
+    listaOrdTop.fim = NULL;
+}
 
 int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotulado) {
     tVertice *vertice, *auxVertice;
@@ -69,7 +91,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
             auxVertice = (tVertice*)malloc(sizeof(tVertice));
             if (auxVertice) {
                 auxVertice->id = 1;
-                auxVertice->aresta = NULL;
+                auxVertice->grafoAresta = NULL;
                 auxVertice->nome = NULL;
                 auxVertice->grau = 0;
                 auxVertice->grauEntrada = 0;
@@ -83,7 +105,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
                 vertice = (tVertice*)malloc(sizeof(tVertice));
                 if (vertice) {
                     vertice->id = i;
-                    auxVertice->aresta = NULL;
+                    auxVertice->grafoAresta = NULL;
                     vertice->nome = NULL;
                     vertice->grau = 0;
                     vertice->grauEntrada = 0;
@@ -103,11 +125,10 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
 
 tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[], int peso) {
     tVertice *vertice;
-
     vertice = (tVertice*)malloc(sizeof(tVertice));
     if (vertice) {
         vertice->id = id;
-        vertice->aresta = NULL;
+        vertice->grafoAresta = NULL;
         vertice->grau = 0;
         vertice->grauEntrada = 0;
         vertice->nome = rotulo;
@@ -133,9 +154,9 @@ int criarAresta(tVertice *origem, tVertice *destino, int peso) {
        return -1;       
     }
 
-    aresta = origem->aresta;
+    aresta = origem->grafoAresta;
     if(aresta == NULL) {
-        origem->aresta = novaAresta;
+        origem->grafoAresta = novaAresta;
     } else {
         while(flagAresta) {
             if (aresta->prox == NULL) {
@@ -233,7 +254,7 @@ void liberarGrafo() {
 
     vertice = grafo->vertice;
     while(vertice != NULL) {
-        aresta = vertice->aresta;
+        aresta = vertice->grafoAresta;
         while(aresta != NULL) {
             auxAresta = aresta;
             aresta = aresta->prox;
@@ -258,7 +279,7 @@ int criarLista() {
     no = listaAdjacencias;
 
     for(i = 0; i < grafo->qtdVertices; i++) {
-        aresta = vertice->aresta;
+        aresta = vertice->grafoAresta;
         no->id = vertice->id;
         no->vertice = vertice;
         no->adjacente = malloc(sizeof(tNo));
@@ -279,6 +300,25 @@ int criarLista() {
     }
     return 0;
 }
+
+int InserirNaListaOrdenacaoTopologica(tVertice* vertice) {
+    
+    tNoOrdTop *noOrdTopologica = malloc(sizeof(tNoOrdTop));
+    noOrdTopologica->vertice = vertice;
+    noOrdTopologica->prox = NULL;
+
+    if(listaOrdTop.inicio == NULL){
+        listaOrdTop.inicio = noOrdTopologica;
+        listaOrdTop.fim = noOrdTopologica;
+    }
+    else{
+        listaOrdTop.fim->prox = noOrdTopologica;
+        listaOrdTop.fim = listaOrdTop.fim->prox;
+    }
+    
+    return 0;
+}
+
 
 // Função para leitura do arquivo
 // Parâmetros: n/a
@@ -310,8 +350,8 @@ void imprimirVertices(tVertice *vertice) {
         // laço para percorrer os vértices
         while (flagVertice) {
             grau = 0;
-            if (vertice->aresta != NULL) {
-                aresta = vertice->aresta;
+            if (vertice->grafoAresta != NULL) {
+                aresta = vertice->grafoAresta;
                 // laço para percorrer as arestas do vértice
                 flagAresta = 1;
                 while (flagAresta) {
@@ -454,7 +494,7 @@ int bronKerbosch(tVertice *r, tVertice *p, tVertice *x) {
             *novo = *p;
             indiceP = p;
             novo->prox = NULL;
-            indiceAresta = p->aresta;
+            indiceAresta = p->grafoAresta;
             p = p->prox;
             free(indiceP);
             indiceP = p;
@@ -521,12 +561,13 @@ int depthFirstSearch(tVertice *vert) {
     
     if (vert->visitado == 0) {
         vert->visitado = 1;
-        aresta = vert->aresta;
+        aresta = vert->grafoAresta;
         while (aresta != NULL) {
             depthFirstSearch(aresta->atalho);
             aresta = aresta->prox;
         }
-        printf("%d ", vert->id);
+        printf("%i ", vert->id);
+        InserirNaListaOrdenacaoTopologica(vert);
     }
     return 0;
 }
@@ -538,6 +579,25 @@ int ordenacaoTopologica() {
         depthFirstSearch(vertice);
         vertice = vertice->prox;
     }
+
+    return 0;
+}
+
+// Analisa o Grafo e insere nos vértices o maior custo
+// para se chegar naquele vértice e também o respectivo vértice anterior
+// a ele que deve se ter como origem para se chegar naquele vértice, 
+// apontando apenas para um vértice atrás 
+int caminhosCriticos(){
+    int i;
+    tVertice* tmp_vertice = grafo->vertice;
+
+    for(i=0; i<grafo->qtdVertices; ++i){
+        tmp_vertice->CriticoAresta = NULL;
+        tmp_vertice->custoFinalizar = 0;
+        tmp_vertice = grafo->vertice->prox;
+    }
+
+
 
     return 0;
 }
@@ -578,7 +638,7 @@ void obterCoeficienteAglomeracaoVertice(tVertice *vertice) {
         vertice->coeficiente = 0;
     } else {
         triangulosPossiveis = (vertice->grau * (vertice->grau - 1)) / 2;
-        indiceAresta = vertice->aresta;
+        indiceAresta = vertice->grafoAresta;
         auxAresta = indiceAresta->prox;
         for (int i = 1; i < vertice->grau; i++) {
             auxVertice = grafo->vertice;
@@ -594,7 +654,7 @@ void obterCoeficienteAglomeracaoVertice(tVertice *vertice) {
                     auxVertice = auxVertice->prox;
                 }
             }
-            auxArestaVertice = auxVertice->aresta;
+            auxArestaVertice = auxVertice->grafoAresta;
             while(auxAresta != NULL) {
                 encontrouAresta = 1;
                 while(auxArestaVertice != NULL && encontrouAresta) {
@@ -604,7 +664,7 @@ void obterCoeficienteAglomeracaoVertice(tVertice *vertice) {
                     }
                     auxArestaVertice = auxArestaVertice->prox;
                 }
-                auxArestaVertice = auxVertice->aresta;
+                auxArestaVertice = auxVertice->grafoAresta;
                 auxAresta = auxAresta->prox;
             }
             indiceAresta = indiceAresta->prox;
@@ -633,14 +693,26 @@ void obterCoeficienteAglomeracaoGrafo() {
     printf("\nO coeficiente de aglomeração do grafo é %.3lf\n", grafo->coeficiente);
 }
 
+void mostrarListaOrdTop(){
+    tNoOrdTop* tmp = listaOrdTop.inicio;
+
+    while (tmp){
+        printf("%i ", tmp->vertice->id);
+        tmp = tmp->prox;
+    }
+}
+
 // Funcao principal do programa
 int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 2 ------\n");
     printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n");
-    printf("---- Hiago (00/000000) ----\n\n");
+    printf("---- Hiago dos Santos Rabelo (16/0124492) ----\n\n");
     lerArquivo();
     imprimirVertices(grafo->vertice);
+    zeraListaOrdTop();
     ordenacaoTopologica();
+    mostrarListaOrdTop();
+    caminhosCriticos();
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
     // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");

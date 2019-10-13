@@ -1,7 +1,8 @@
 Teoria e aplicação de grafos - Turma A - 2019/2
 João Antonio Desiderio de Moraes (16/0126975)
+Hiago dos Santos Rabelo (16/0124492)
 
-Esta é a entrega do primeiro projeto de Teoria e Aplicação de Grafos 2019.2. O projeto foi inteiramente produzido pelo aluno João Antonio Desiderio de Moraes com o auxílio das notas de classe e alguns outros materiais didáticos sobre estruturas de dados e sobre o algoritmo Bron-Kerbosch.
+Esta é a entrega do segundo projeto de Teoria e Aplicação de Grafos 2019.2. 
 
 AVISO
     O programa contido no arquivo "tag1.c" foi desenvolvido em Linux (Mint 19.1), compilado e testado com o gcc mais atual. O código não utiliza nada além de algumas bibliotecas padrão.
@@ -28,6 +29,7 @@ Incluo aqui um log da execução esperada para conferência.
 
 ------ Teoria e Aplicação de Grafos - Projeto 1. ------
 ---- João Antonio Desiderio de Moraes (16/0126975) ----
+---- Hiago dos Santos Rabelo (16/0124492) ----
 
 Questão 1: imprimir os vértices e seus respectivos graus
 
