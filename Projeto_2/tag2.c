@@ -566,7 +566,7 @@ int depthFirstSearch(tVertice *vert) {
             depthFirstSearch(aresta->atalho);
             aresta = aresta->prox;
         }
-        printf("%i ", vert->peso);
+        printf("%i ", vert->id);
         InserirNaListaOrdenacaoTopologica(vert);
     }
     return 0;
