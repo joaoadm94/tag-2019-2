@@ -566,7 +566,7 @@ int depthFirstSearch(tVertice *vert) {
             depthFirstSearch(aresta->atalho);
             aresta = aresta->prox;
         }
-        printf("%i ", vert->id);
+        printf("%i ", vert->peso);
         InserirNaListaOrdenacaoTopologica(vert);
     }
     return 0;
@@ -589,15 +589,32 @@ int ordenacaoTopologica() {
 // apontando apenas para um vértice atrás 
 int caminhosCriticos(){
     int i;
+    int aux_custo;
+    tAresta* tmp_aresta;
+    tNoOrdTop *tmpNoOrd = listaOrdTop.inicio;
     tVertice* tmp_vertice = grafo->vertice;
+
 
     for(i=0; i<grafo->qtdVertices; ++i){
         tmp_vertice->CriticoAresta = NULL;
         tmp_vertice->custoFinalizar = 0;
         tmp_vertice = grafo->vertice->prox;
     }
+    printf("\n\n peso...\n");
+    tmp_aresta = tmpNoOrd->vertice->grafoAresta;
 
+    for(i=0; i<grafo->qtdVertices; ++i){
+        tmp_aresta = tmpNoOrd->vertice->grafoAresta;
+        printf("id vértice atual: %i \n", tmpNoOrd->vertice->id);
 
+        while(tmp_aresta){
+            aux_custo = tmp_aresta->atalho->peso + tmpNoOrd->vertice->peso;
+            tmp_aresta->atalho->custoFinalizar = MAX(
+                    tmp_aresta->atalho->custoFinalizar, aux_custo);
+            tmp_aresta = tmp_aresta->prox;
+        }
+        tmpNoOrd = tmpNoOrd->prox;
+    }
 
     return 0;
 }
@@ -696,8 +713,9 @@ void obterCoeficienteAglomeracaoGrafo() {
 void mostrarListaOrdTop(){
     tNoOrdTop* tmp = listaOrdTop.inicio;
 
+    printf("\n\n\n");
     while (tmp){
-        printf("%i ", tmp->vertice->id);
+        printf("%i ", tmp->vertice->custoFinalizar);
         tmp = tmp->prox;
     }
 }
@@ -713,6 +731,7 @@ int main() {
     ordenacaoTopologica();
     mostrarListaOrdTop();
     caminhosCriticos();
+    // LiberaListaOrdTop(); <<< Não esquecer !!!!!!
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
     // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
