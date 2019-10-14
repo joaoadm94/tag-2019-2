@@ -22,6 +22,7 @@ typedef struct vertice {
     int grau;           // grau do vértice
     int grauEntrada;    // grau de entrada do vertices
     int custoFinalizar; // maior custo para se chegar e finalizar esse vértice (dag)
+    vertice *VerticeAntMaiorCusto; // de qual vértice tem que partir para se chegar no de maior custo
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
@@ -614,23 +615,35 @@ int caminhosCriticos(){
 
 
     for(i=0; i<grafo->qtdVertices; ++i){
-        tmp_vertice->CriticoAresta = NULL;
-        tmp_vertice->custoFinalizar = 0;
+        // tmp_vertice->CriticoAresta = NULL;
+        tmp_vertice->custoFinalizar = tmp_vertice->peso;
+        tmp_vertice->VerticeAntMaiorCusto = tmp_vertice;
+
         tmp_vertice = grafo->vertice->prox;
     }
     tmp_aresta = tmpNoOrd->vertice->grafoAresta;
 
     for(i=0; i<grafo->qtdVertices; ++i){
         tmp_aresta = tmpNoOrd->vertice->grafoAresta;
-        // printf("id vértice atual: %i \n", tmpNoOrd->vertice->id);
+        // printf("id vértice atual: %s \n", tmpNoOrd->vertice->nome);
 
         while(tmp_aresta){
-            aux_custo = tmp_aresta->atalho->peso + tmpNoOrd->vertice->peso;
-            tmp_aresta->atalho->custoFinalizar = MAX(
-                    tmp_aresta->atalho->custoFinalizar, aux_custo);
+            aux_custo = tmp_aresta->atalho->peso + tmpNoOrd->vertice->custoFinalizar;
+            if(tmp_aresta->atalho->custoFinalizar < aux_custo){
+                tmp_aresta->atalho->custoFinalizar = aux_custo;
+                tmp_aresta->atalho->VerticeAntMaiorCusto = tmpNoOrd->vertice;
+            }
             tmp_aresta = tmp_aresta->prox;
         }
         tmpNoOrd = tmpNoOrd->prox;
+    }
+    printf("\n");
+    tmp_vertice = grafo->vertice;
+    for(i=0; i<grafo->qtdVertices;++i){
+        printf("Maior custo para finalizar (%s): %i\n", tmp_vertice->nome,
+                                            tmp_vertice->custoFinalizar);
+        printf("Vértice anterior maior custo: %s\n\n", tmp_vertice->VerticeAntMaiorCusto->nome);                                    
+        tmp_vertice = tmp_vertice->prox;
     }
 
     return 0;
