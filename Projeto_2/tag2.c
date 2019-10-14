@@ -721,6 +721,23 @@ void mostrarListaOrdTop(){
     }
 }
 
+void liberarListaOrdTop(){
+    tNoOrdTop* tmp;
+    if(!listaOrdTop.inicio)
+        return;
+
+    printf("Liberando lista de ordenação topológica\n");
+    do{
+        tmp = listaOrdTop.inicio;
+        listaOrdTop.inicio = listaOrdTop.inicio->prox;
+        
+        free(tmp);
+    }while(listaOrdTop.inicio);
+
+    listaOrdTop.fim = NULL;
+}
+
+
 // Funcao principal do programa
 int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 2 ------\n");
@@ -732,7 +749,7 @@ int main() {
     ordenacaoTopologica();
     mostrarListaOrdTop();
     caminhosCriticos();
-    // LiberaListaOrdTop(); <<< Não esquecer !!!!!!
+    liberarListaOrdTop(); 
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
     // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
