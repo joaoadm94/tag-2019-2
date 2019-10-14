@@ -737,6 +737,35 @@ void liberarListaOrdTop(){
     listaOrdTop.fim = NULL;
 }
 
+int converterOrdTopologicaParaArquivoVisual(){
+    char *arquivoFonteDot = "grafo.dot";
+    char *formatoGrafo = "digraph Disciplinas {\n";
+    char comando[200];
+
+    FILE *pArq; 
+    tAresta *arestaAux;
+    tVertice *verticeAux = grafo->vertice;
+    int i;
+
+    pArq = fopen(arquivoFonteDot, "w");
+    fprintf(pArq, formatoGrafo);
+
+    for(i = 0; i < grafo->qtdVertices; i++){
+        arestaAux = verticeAux->grafoAresta;
+
+        while(arestaAux){
+            fprintf(pArq, "%s -> %s;\n", verticeAux->nome, arestaAux->atalho->nome);
+            arestaAux = arestaAux->prox;
+        }
+        verticeAux = verticeAux->prox;
+    }
+
+    fprintf(pArq,"\n}");
+    fclose(pArq);
+
+    sprintf(comando, "dot -Tpng -O '%s'", arquivoFonteDot);
+    return system(comando);
+}
 
 // Funcao principal do programa
 int main() {
@@ -750,6 +779,10 @@ int main() {
     mostrarListaOrdTop();
     caminhosCriticos();
     liberarListaOrdTop(); 
+    if(converterOrdTopologicaParaArquivoVisual()){
+        printf("Não foi possível passar o grafo para o arquivo visual\n");
+        return EXIT_FAILURE;
+    }
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
     // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
