@@ -12,6 +12,7 @@ typedef struct vertice vertice;
 typedef struct aresta{
     int terminal;       // índice do vértice terminal
     int peso;           // peso ou valor da aresta, 0 = peso padrão
+    int visitado;
     vertice *atalho;    //
     struct aresta *prox; // referencia para a prox aresta
 } tAresta;
@@ -53,6 +54,7 @@ typedef struct NoOrdTop{
 typedef struct OrdenacaoTop{
     tNoOrdTop *inicio;
     tNoOrdTop *fim;
+    int ciclo;
 } listaOrdenacaoTop;
 
 // ------------------ Variáveis globais --------------------
@@ -69,6 +71,7 @@ listaOrdenacaoTop listaOrdTop; // referencia para a lista de adjacencias
 void zeraListaOrdTop(){
     listaOrdTop.inicio = NULL;
     listaOrdTop.fim = NULL;
+    listaOrdTop.ciclo = 0;
 }
 
 int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotulado) {
@@ -325,7 +328,7 @@ int InserirNaListaOrdenacaoTopologica(tVertice* vertice) {
 // Parâmetros: n/a
 // Retornos: -1 para falha e 0 para sucesso
 int lerArquivo() {
-    FILE *arquivo = fopen("curriculo.mtx", "r");
+    FILE *arquivo = fopen("teste.mtx", "r");
     int result;
 
     if (arquivo == NULL) {
@@ -559,15 +562,24 @@ int bronKerbosch(tVertice *r, tVertice *p, tVertice *x) {
 
 int depthFirstSearch(tVertice *vert) {
     tAresta *aresta;
+    int result = 0;
     
+    if(vert->visitado == 1) {
+        return -1;
+    }
     if (vert->visitado == 0) {
-        vert->visitado = 1;
+        vert->visitado = 1; 
         aresta = vert->grafoAresta;
-        while (aresta != NULL) {
-            depthFirstSearch(aresta->atalho);
-            aresta = aresta->prox;
+        if (aresta != NULL) {
+            while (aresta != NULL && result == 0) {
+                result = depthFirstSearch(aresta->atalho);
+                aresta = aresta->prox;
+            }
         }
-        printf("%s ", vert->nome);
+        if (result == -1) {
+            return -1;
+        }
+        vert->visitado = 2;
         InserirNaListaOrdenacaoTopologica(vert);
     }
     return 0;
@@ -575,10 +587,15 @@ int depthFirstSearch(tVertice *vert) {
 
 int ordenacaoTopologica() {
     tVertice *vertice = grafo->vertice;
+    int result = 0;
 
-    while (vertice != NULL) {
-        depthFirstSearch(vertice);
+    while (vertice != NULL && result == 0) {
+        result = depthFirstSearch(vertice);
         vertice = vertice->prox;
+    }
+    if (result == -1) {
+        printf("Ciclo encontrado. Ordenacao topologica impossivel. \n");
+        listaOrdTop.ciclo = 1;
     }
 
     return 0;
@@ -716,7 +733,8 @@ void mostrarListaOrdTop(){
 
     printf("\n\n\n");
     while (tmp){
-        printf("%i ", tmp->vertice->custoFinalizar);
+        // printf("%i ", tmp->vertice->custoFinalizar);
+        printf("%i ", tmp->vertice->id);
         tmp = tmp->prox;
     }
 }
@@ -746,9 +764,12 @@ int main() {
     lerArquivo();
     imprimirVertices(grafo->vertice);
     zeraListaOrdTop();
+    printf("Realizando ordenacao topologica... \n");
     ordenacaoTopologica();
-    mostrarListaOrdTop();
-    caminhosCriticos();
+    if (listaOrdTop.ciclo == 0) {
+        mostrarListaOrdTop();
+        caminhosCriticos();
+    }
     liberarListaOrdTop(); 
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
