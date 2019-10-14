@@ -23,7 +23,7 @@ typedef struct vertice {
     int custoFinalizar; // maior custo para se chegar e finalizar esse vértice (dag)
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
-    char *nome;         // referencia p/ o nome do vértice
+    char nome[10];         // referencia p/ o nome do vértice
     int visitado;       //
     tAresta *grafoAresta;    // referencia p/ a lista de arestas (grafo)
     tAresta *CriticoAresta;  // referencia p/ lista de arestas (caminho crítico)
@@ -92,7 +92,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
             if (auxVertice) {
                 auxVertice->id = 1;
                 auxVertice->grafoAresta = NULL;
-                auxVertice->nome = NULL;
+                // auxVertice->nome;
                 auxVertice->grau = 0;
                 auxVertice->grauEntrada = 0;
                 auxVertice->visitado = 0;
@@ -106,7 +106,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
                 if (vertice) {
                     vertice->id = i;
                     auxVertice->grafoAresta = NULL;
-                    vertice->nome = NULL;
+                    // vertice->nome = NULL;
                     vertice->grau = 0;
                     vertice->grauEntrada = 0;
                     vertice->visitado = 0;
@@ -131,7 +131,7 @@ tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[], int 
         vertice->grafoAresta = NULL;
         vertice->grau = 0;
         vertice->grauEntrada = 0;
-        vertice->nome = rotulo;
+        strcpy(vertice->nome, rotulo);
         vertice->prox = NULL;
         vertice->peso = peso;
         vertice->visitado = 0;
@@ -225,6 +225,7 @@ int lerGrafo(FILE *arquivo) {
         auxVertice = NULL;
         fgets(linha, 20, arquivo);
         sscanf(linha, "%d %s %d", &id, rotulo, &peso);
+        printf("%s", rotulo);
         vertice = inserirVerticeRotulado(auxVertice, id, rotulo, peso);
         grafo->vertice = vertice;
         auxVertice = vertice;
@@ -566,7 +567,7 @@ int depthFirstSearch(tVertice *vert) {
             depthFirstSearch(aresta->atalho);
             aresta = aresta->prox;
         }
-        printf("%i ", vert->id);
+        printf("%s ", vert->nome);
         InserirNaListaOrdenacaoTopologica(vert);
     }
     return 0;
