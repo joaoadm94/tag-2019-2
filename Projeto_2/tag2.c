@@ -225,7 +225,7 @@ int lerGrafo(FILE *arquivo) {
         auxVertice = NULL;
         fgets(linha, 20, arquivo);
         sscanf(linha, "%d %s %d", &id, rotulo, &peso);
-        printf("%s", rotulo);
+        
         vertice = inserirVerticeRotulado(auxVertice, id, rotulo, peso);
         grafo->vertice = vertice;
         auxVertice = vertice;
@@ -575,7 +575,7 @@ int depthFirstSearch(tVertice *vert) {
 
 int ordenacaoTopologica() {
     tVertice *vertice = grafo->vertice;
-
+    printf("Criando lista de ordenação topológica...\n");
     while (vertice != NULL) {
         depthFirstSearch(vertice);
         vertice = vertice->prox;
@@ -601,12 +601,11 @@ int caminhosCriticos(){
         tmp_vertice->custoFinalizar = 0;
         tmp_vertice = grafo->vertice->prox;
     }
-    printf("\n\n peso...\n");
     tmp_aresta = tmpNoOrd->vertice->grafoAresta;
 
     for(i=0; i<grafo->qtdVertices; ++i){
         tmp_aresta = tmpNoOrd->vertice->grafoAresta;
-        printf("id vértice atual: %i \n", tmpNoOrd->vertice->id);
+        // printf("id vértice atual: %i \n", tmpNoOrd->vertice->id);
 
         while(tmp_aresta){
             aux_custo = tmp_aresta->atalho->peso + tmpNoOrd->vertice->peso;
@@ -716,7 +715,7 @@ void mostrarListaOrdTop(){
 
     printf("\n\n\n");
     while (tmp){
-        printf("%i ", tmp->vertice->custoFinalizar);
+        // printf("%i ", tmp->vertice->custoFinalizar);
         tmp = tmp->prox;
     }
 }
