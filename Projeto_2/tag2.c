@@ -328,7 +328,7 @@ int InserirNaListaOrdenacaoTopologica(tVertice* vertice) {
 // Parâmetros: n/a
 // Retornos: -1 para falha e 0 para sucesso
 int lerArquivo() {
-    FILE *arquivo = fopen("teste.mtx", "r");
+    FILE *arquivo = fopen("curriculo.mtx", "r");
     int result;
 
     if (arquivo == NULL) {
