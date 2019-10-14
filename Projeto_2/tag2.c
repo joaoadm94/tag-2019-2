@@ -737,7 +737,7 @@ void liberarListaOrdTop(){
     listaOrdTop.fim = NULL;
 }
 
-int converterOrdTopologicaParaArquivoVisual(){
+int converteGrafoParaArquivoVisual(){
     char *arquivoFonteDot = "grafo.dot";
     char *formatoGrafo = "digraph Disciplinas {\n";
     char comando[200];
@@ -767,6 +767,31 @@ int converterOrdTopologicaParaArquivoVisual(){
     return system(comando);
 }
 
+int converteOrdTopologicaParaArquivoVisual(){
+    char *arquivoFonteDot = "ordenacaoTop.dot";
+    char *formatoOrd = "digraph OrdenacaoTopol {\n";
+    char comando[200];
+
+    FILE *pArq; 
+    tNoOrdTop *noOrdTopAux = listaOrdTop.inicio;
+    int i;
+
+    pArq = fopen(arquivoFonteDot, "w");
+    fprintf(pArq, formatoOrd);
+
+    for(i = 0; i < grafo->qtdVertices; i++){
+
+        fprintf(pArq, "%s ;", noOrdTopAux->vertice->nome);
+        noOrdTopAux = noOrdTopAux->prox;
+    }
+
+    fprintf(pArq,"\n}");
+    fclose(pArq);
+
+    sprintf(comando, "dot -Tpng -O '%s'", arquivoFonteDot);
+    return system(comando);
+}
+
 // Funcao principal do programa
 int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 2 ------\n");
@@ -778,11 +803,16 @@ int main() {
     ordenacaoTopologica();
     mostrarListaOrdTop();
     caminhosCriticos();
-    liberarListaOrdTop(); 
-    if(converterOrdTopologicaParaArquivoVisual()){
+    if(converteGrafoParaArquivoVisual()){
         printf("Não foi possível passar o grafo para o arquivo visual\n");
         return EXIT_FAILURE;
     }
+
+    if(converteOrdTopologicaParaArquivoVisual()){
+        printf("Não foi possível criar aquivo visual da ordenação topológica\n");
+        return EXIT_FAILURE;
+    }
+    liberarListaOrdTop(); 
     // printf("\nQuestão 2: imprimir todos os cliques maximais\n\n");
     // imprimirCliques();
     // printf("\nQuestão 3: imprimir o coeficiente de aglomeração de cada vértice\n\n");
