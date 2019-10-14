@@ -228,7 +228,6 @@ int lerGrafo(FILE *arquivo) {
         auxVertice = NULL;
         fgets(linha, 20, arquivo);
         sscanf(linha, "%d %s %d", &id, rotulo, &peso);
-        printf("%s", rotulo);
         vertice = inserirVerticeRotulado(auxVertice, id, rotulo, peso);
         grafo->vertice = vertice;
         auxVertice = vertice;
@@ -762,9 +761,10 @@ int main() {
     printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n");
     printf("---- Hiago dos Santos Rabelo (16/0124492) ----\n\n");
     lerArquivo();
-    imprimirVertices(grafo->vertice);
+    // imprimirVertices(grafo->vertice);
     zeraListaOrdTop();
-    printf("Realizando ordenacao topologica... \n");
+    printf("Realizando ordenacao topologica das materias \n");
+    printf("do curso de Ciencia da Computacao/UnB. \n");
     ordenacaoTopologica();
     if (listaOrdTop.ciclo == 0) {
         mostrarListaOrdTop();
