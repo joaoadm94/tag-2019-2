@@ -316,8 +316,8 @@ int InserirNaListaOrdenacaoTopologica(tVertice* vertice) {
         listaOrdTop.fim = noOrdTopologica;
     }
     else{
-        listaOrdTop.fim->prox = noOrdTopologica;
-        listaOrdTop.fim = listaOrdTop.fim->prox;
+        noOrdTopologica->prox = listaOrdTop.inicio;
+        listaOrdTop.inicio = noOrdTopologica;
     }
     
     return 0;
@@ -734,7 +734,7 @@ void mostrarListaOrdTop(){
     printf("\n\n\n");
     while (tmp){
         // printf("%i ", tmp->vertice->custoFinalizar);
-        printf("%i ", tmp->vertice->id);
+        printf("%s ", tmp->vertice->nome);
         tmp = tmp->prox;
     }
 }
