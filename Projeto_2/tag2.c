@@ -48,12 +48,12 @@ typedef struct no {
 typedef struct NoOrdTop{
     tVertice *vertice;
     struct NoOrdTop *prox;
-}tNoOrdTop;
+} tNoOrdTop;
 
 typedef struct OrdenacaoTop{
     tNoOrdTop *inicio;
     tNoOrdTop *fim;
-}listaOrdenacaoTop;
+} listaOrdenacaoTop;
 
 // ------------------ Variáveis globais --------------------
 
