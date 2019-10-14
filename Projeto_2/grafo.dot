@@ -1,5 +1,5 @@
 digraph Disciplinas {
-"A" -> "B";
+ c [color=lightblue, label="Curso: Ciência da Computação"];"A" -> "B";
 "A" -> "C";
 "B" -> "D";
 "C" -> "D";
