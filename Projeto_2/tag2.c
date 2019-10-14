@@ -12,6 +12,7 @@ typedef struct vertice vertice;
 typedef struct aresta{
     int terminal;       // índice do vértice terminal
     int peso;           // peso ou valor da aresta, 0 = peso padrão
+    int visitado;
     vertice *atalho;    //
     struct aresta *prox; // referencia para a prox aresta
 } tAresta;
@@ -48,12 +49,13 @@ typedef struct no {
 typedef struct NoOrdTop{
     tVertice *vertice;
     struct NoOrdTop *prox;
-}tNoOrdTop;
+} tNoOrdTop;
 
 typedef struct OrdenacaoTop{
     tNoOrdTop *inicio;
     tNoOrdTop *fim;
-}listaOrdenacaoTop;
+    int ciclo;
+} listaOrdenacaoTop;
 
 // ------------------ Variáveis globais --------------------
 
@@ -69,6 +71,7 @@ listaOrdenacaoTop listaOrdTop; // referencia para a lista de adjacencias
 void zeraListaOrdTop(){
     listaOrdTop.inicio = NULL;
     listaOrdTop.fim = NULL;
+    listaOrdTop.ciclo = 0;
 }
 
 int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotulado) {
@@ -313,8 +316,8 @@ int InserirNaListaOrdenacaoTopologica(tVertice* vertice) {
         listaOrdTop.fim = noOrdTopologica;
     }
     else{
-        listaOrdTop.fim->prox = noOrdTopologica;
-        listaOrdTop.fim = listaOrdTop.fim->prox;
+        noOrdTopologica->prox = listaOrdTop.inicio;
+        listaOrdTop.inicio = noOrdTopologica;
     }
     
     return 0;
@@ -325,7 +328,7 @@ int InserirNaListaOrdenacaoTopologica(tVertice* vertice) {
 // Parâmetros: n/a
 // Retornos: -1 para falha e 0 para sucesso
 int lerArquivo() {
-    FILE *arquivo = fopen("curriculo.mtx", "r");
+    FILE *arquivo = fopen("teste.mtx", "r");
     int result;
 
     if (arquivo == NULL) {
@@ -559,15 +562,24 @@ int bronKerbosch(tVertice *r, tVertice *p, tVertice *x) {
 
 int depthFirstSearch(tVertice *vert) {
     tAresta *aresta;
+    int result = 0;
     
+    if(vert->visitado == 1) {
+        return -1;
+    }
     if (vert->visitado == 0) {
-        vert->visitado = 1;
+        vert->visitado = 1; 
         aresta = vert->grafoAresta;
-        while (aresta != NULL) {
-            depthFirstSearch(aresta->atalho);
-            aresta = aresta->prox;
+        if (aresta != NULL) {
+            while (aresta != NULL && result == 0) {
+                result = depthFirstSearch(aresta->atalho);
+                aresta = aresta->prox;
+            }
         }
-        printf("%s ", vert->nome);
+        if (result == -1) {
+            return -1;
+        }
+        vert->visitado = 2;
         InserirNaListaOrdenacaoTopologica(vert);
     }
     return 0;
@@ -575,10 +587,15 @@ int depthFirstSearch(tVertice *vert) {
 
 int ordenacaoTopologica() {
     tVertice *vertice = grafo->vertice;
-    printf("Criando lista de ordenação topológica...\n");
-    while (vertice != NULL) {
-        depthFirstSearch(vertice);
+    int result = 0;
+
+    while (vertice != NULL && result == 0) {
+        result = depthFirstSearch(vertice);
         vertice = vertice->prox;
+    }
+    if (result == -1) {
+        printf("Ciclo encontrado. Ordenacao topologica impossivel. \n");
+        listaOrdTop.ciclo = 1;
     }
 
     return 0;
@@ -715,6 +732,7 @@ void mostrarListaOrdTop(){
 
     printf("\n\n\n");
     while (tmp){
+        printf("%s ", tmp->vertice->nome);
         // printf("%i ", tmp->vertice->custoFinalizar);
         tmp = tmp->prox;
     }
@@ -725,7 +743,7 @@ void liberarListaOrdTop(){
     if(!listaOrdTop.inicio)
         return;
 
-    printf("Liberando lista de ordenação topológica\n");
+    printf("Liberando memória alocada para lista de ordenação topológica\n");
     do{
         tmp = listaOrdTop.inicio;
         listaOrdTop.inicio = listaOrdTop.inicio->prox;
@@ -799,16 +817,18 @@ int main() {
     lerArquivo();
     imprimirVertices(grafo->vertice);
     zeraListaOrdTop();
+    printf("Realizando ordenacao topologica... \n");
     ordenacaoTopologica();
-    mostrarListaOrdTop();
-    caminhosCriticos();
-    if(converteGrafoParaArquivoVisual()){
-        printf("Não foi possível passar o grafo para o arquivo visual\n");
-        return EXIT_FAILURE;
-    }
-
+    if (listaOrdTop.ciclo == 0) {
+        mostrarListaOrdTop();
+        caminhosCriticos();
     if(converteOrdTopologicaParaArquivoVisual()){
         printf("Não foi possível criar aquivo visual da ordenação topológica\n");
+        return EXIT_FAILURE;
+    }
+    }
+    if(converteGrafoParaArquivoVisual()){
+        printf("Não foi possível passar o grafo para o arquivo visual\n");
         return EXIT_FAILURE;
     }
     liberarListaOrdTop(); 
