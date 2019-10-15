@@ -333,7 +333,7 @@ int InserirNaListaOrdenacaoTopologica(tVertice* vertice) {
 // Parâmetros: n/a
 // Retornos: -1 para falha e 0 para sucesso
 int lerArquivo() {
-    FILE *arquivo = fopen("teste.mtx", "r");
+    FILE *arquivo = fopen("curriculo.mtx", "r");
     int result;
 
     if (arquivo == NULL) {
@@ -373,7 +373,10 @@ void imprimirVertices(tVertice *vertice) {
                 }
             }
             vertice->grau = grau;
-            printf("Vértice %d - Grau %d - Entrada %d\n", vertice->id, vertice->grau, vertice->grauEntrada);
+            printf("Vértice %d - Grau %d - Entrada %d - Peso %d\n", vertice->id, 
+                                                                    vertice->grau, 
+                                                                    vertice->grauEntrada,
+                                                                    vertice->peso);
             if (vertice->prox == NULL) {
                 flagVertice = 0;
             } else {
@@ -617,13 +620,18 @@ int InsereNosVerticesOCustoDeChegada(){
     tNoOrdTop *tmpNoOrd = listaOrdTop.inicio;
     tVertice* tmp_vertice = grafo->vertice;
 
-
     for(i=0; i<grafo->qtdVertices; ++i){
         // tmp_vertice->CriticoAresta = NULL;
         tmp_vertice->custoFinalizar = tmp_vertice->peso;
         tmp_vertice->VerticeAntMaiorCusto = tmp_vertice;
+        // printf("%s: %i\n", tmp_vertice->nome, tmp_vertice->custoFinalizar);
 
         tmp_vertice = tmp_vertice->prox;
+
+<<<<<<< HEAD
+        tmp_vertice = tmp_vertice->prox;
+=======
+>>>>>>> 17faa3039d5d0314209f565a72d94acd4162e36f
     }
     tmp_aresta = tmpNoOrd->vertice->grafoAresta;
 
@@ -631,8 +639,10 @@ int InsereNosVerticesOCustoDeChegada(){
         tmp_aresta = tmpNoOrd->vertice->grafoAresta;
         // printf("id vértice atual: %s \n", tmpNoOrd->vertice->nome);
 
+        
         while(tmp_aresta){
             aux_custo = tmp_aresta->atalho->peso + tmpNoOrd->vertice->custoFinalizar;
+            // printf("%d ", aux_custo);
             if(tmp_aresta->atalho->custoFinalizar < aux_custo){
                 tmp_aresta->atalho->custoFinalizar = aux_custo;
                 tmp_aresta->atalho->VerticeAntMaiorCusto = tmpNoOrd->vertice;
@@ -643,12 +653,12 @@ int InsereNosVerticesOCustoDeChegada(){
     }
     printf("\n");
     tmp_vertice = grafo->vertice;
-    for(i=0; i<grafo->qtdVertices;++i){
-        printf("Maior custo para finalizar (%s): %i\n", tmp_vertice->nome,
-                                            tmp_vertice->custoFinalizar);
-        printf("Vértice anterior maior custo: %s\n\n", tmp_vertice->VerticeAntMaiorCusto->nome);                                    
-        tmp_vertice = tmp_vertice->prox;
-    }
+    // for(i=0; i<grafo->qtdVertices;++i){
+    //     printf("Maior custo para finalizar (%s): %i\n", tmp_vertice->nome,
+    //                                         tmp_vertice->custoFinalizar);
+    //     printf("Vértice anterior maior custo: %s\n\n", tmp_vertice->VerticeAntMaiorCusto->nome);                                    
+    //     tmp_vertice = tmp_vertice->prox;
+    // }
 
     return 0;
 }
@@ -774,7 +784,7 @@ void liberarListaOrdTop(){
 int converteGrafoParaArquivoVisual(){
     char *arquivoFonteDot = "grafo.dot";
     char *formatoGrafo = "digraph Disciplinas {\n";
-    char *curso = " c [color=lightblue, label=\"Curso: Ciência da Computação\"];";
+    char *curso = " c [color=lightblue, label=\"Curso: Ciência da Computação\"];\n";
     char comando[200];
 
     FILE *pArq; 
@@ -809,7 +819,7 @@ int converteGrafoParaArquivoVisual(){
 int converteOrdTopologicaParaArquivoVisual(){
     char *arquivoFonteDot = "ordenacaoTop.dot";
     char *formatoOrd = "digraph OrdenacaoTopol {\n";
-    char *curso = " c [color=lightblue, label=\"Curso: Ciência da Computação\"];";
+    char *curso = " c [color=lightblue, label=\"Curso: Ciência da Computação\"];\n";
     char comando[200];
 
     FILE *pArq; 
@@ -834,22 +844,24 @@ int converteOrdTopologicaParaArquivoVisual(){
 }
 
 int converteCaminhoCriticoParaArquivoVisual(){
-    char *arquivoFonteDot = "ordenacaoTop.dot";
-    char *formatoOrd = "digraph OrdenacaoTopol {\n";
+    char *arquivoFonteDot = "CaminhoCritico.dot";
+    char *formatoOrd = "digraph CaminhoCritico {\n";
+    char *curso = " c [color=lightblue, label=\"Curso: Ciência da Computação\"];\n";
     char comando[200];
-
     FILE *pArq; 
     tNoOrdTop *noOrdTopAux = listaOrdTop.inicio;
-    int i;
+    tVertice *tmpVerticeCritico = maiorESegundoMaiorCaminho.Maior;
+    // int i;
 
     pArq = fopen(arquivoFonteDot, "w");
     fprintf(pArq, formatoOrd);
+    fprintf(pArq, curso);
 
-    for(i = 0; i < grafo->qtdVertices; i++){
-
-        fprintf(pArq, "%s ;", noOrdTopAux->vertice->nome);
-        noOrdTopAux = noOrdTopAux->prox;
-    }
+    do{
+        fprintf(pArq, "%s -> %s ;\n",tmpVerticeCritico->VerticeAntMaiorCusto, 
+                                   tmpVerticeCritico->nome);
+        tmpVerticeCritico = tmpVerticeCritico->VerticeAntMaiorCusto;
+    }while(tmpVerticeCritico != tmpVerticeCritico->VerticeAntMaiorCusto);
 
     fprintf(pArq,"\n}");
     fclose(pArq);
@@ -878,6 +890,32 @@ void achaVerticesComMaiorCustoDeChegadaEInsereNaStruct(){
     maiorESegundoMaiorCaminho.segundoMaior = verticeSegundoCaminhoMaior;
 }
 
+void passaCaminhoCriticoParaArquivoVisual(){
+    char *arquivoFonteDot = "CaminhoCritico.dot";
+    char *formatoOrd = "digraph CaminhoCritico {\n";
+    char comando[200];
+
+    FILE *pArq; 
+    tVertice *verticeCritico = maiorESegundoMaiorCaminho.Maior;
+    // int i;
+
+    pArq = fopen(arquivoFonteDot, "w");
+    fprintf(pArq, formatoOrd);
+
+    do{
+        fprintf(pArq, "%s -> %s;\n", verticeCritico->VerticeAntMaiorCusto->nome, 
+                                     verticeCritico->nome);
+
+        verticeCritico = verticeCritico->VerticeAntMaiorCusto;
+    }while(verticeCritico != verticeCritico->VerticeAntMaiorCusto);
+
+    fprintf(pArq,"\n}");
+    fclose(pArq);
+
+    sprintf(comando, "dot -Tpng -O '%s'", arquivoFonteDot);
+    return system(comando);
+}
+
 // Funcao principal do programa
 int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 2 ------\n");
@@ -901,7 +939,7 @@ int main() {
         return EXIT_FAILURE;
     }
     achaVerticesComMaiorCustoDeChegadaEInsereNaStruct();
-
+    passaCaminhoCriticoParaArquivoVisual();
     // printf(">> Caminhos críticos: \n");
     // printf("Maior: %s\n", maiorESegundoMaiorCaminho.Maior->nome);
     // printf("Segundo Maior: %s\n", maiorESegundoMaiorCaminho.segundoMaior->nome);

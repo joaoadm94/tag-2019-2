@@ -1,3 +1,0 @@
-digraph OrdenacaoTopol {
- c [color=lightblue, label="Curso: Ciência da Computação"];"G" ;"A" ;"C" ;"E" ;"B" ;"D" ;"F" ;
-}
