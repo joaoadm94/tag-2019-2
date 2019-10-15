@@ -794,6 +794,9 @@ int converteGrafoParaArquivoVisual(){
     for(i = 0; i < grafo->qtdVertices; i++){
         arestaAux = verticeAux->grafoAresta;
 
+        if (verticeAux->grauEntrada == 0 && arestaAux == NULL) {
+            fprintf(pArq, "%s;\n", verticeAux->nome);
+        }
         while(arestaAux){
             fprintf(pArq, "%s -> %s;\n", verticeAux->nome, arestaAux->atalho->nome);
             arestaAux = arestaAux->prox;
