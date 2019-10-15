@@ -780,7 +780,7 @@ void liberarListaOrdTop(){
 int converteGrafoParaArquivoVisual(){
     char *arquivoFonteDot = "grafo.dot";
     char *formatoGrafo = "digraph Disciplinas {\n";
-    char *curso = " c [color=lightblue, label=\"Curso: Ciência da Computação\"];\n";
+    char *descricao = " c [color=lightblue, label=\"Disciplinas\nCurso: Ciência da Computação\"];\n";
     char comando[200];
 
     FILE *pArq; 
@@ -790,7 +790,7 @@ int converteGrafoParaArquivoVisual(){
 
     pArq = fopen(arquivoFonteDot, "w");
     fprintf(pArq, formatoGrafo);
-    fprintf(pArq, curso);
+    fprintf(pArq, descricao);
 
     for(i = 0; i < grafo->qtdVertices; i++){
         arestaAux = verticeAux->grafoAresta;
@@ -812,7 +812,7 @@ int converteGrafoParaArquivoVisual(){
 int converteOrdTopologicaParaArquivoVisual(){
     char *arquivoFonteDot = "ordenacaoTop.dot";
     char *formatoOrd = "digraph OrdenacaoTopol {\n";
-    char *curso = " c [color=lightblue, label=\"Curso: Ciência da Computação\"];\n";
+    char *descricao = " c [color=lightblue, label=\"Ordenação Topológica\"]";
     char comando[200];
 
     FILE *pArq; 
@@ -821,7 +821,7 @@ int converteOrdTopologicaParaArquivoVisual(){
 
     pArq = fopen(arquivoFonteDot, "w");
     fprintf(pArq, formatoOrd);
-    fprintf(pArq, curso);
+    fprintf(pArq, descricao);
 
     for(i = 0; i < grafo->qtdVertices; i++){
 
@@ -886,6 +886,7 @@ void achaVerticesComMaiorCustoDeChegadaEInsereNaStruct(){
 void passaCaminhoCriticoParaArquivoVisual(){
     char *arquivoFonteDot = "CaminhoCritico.dot";
     char *formatoOrd = "digraph CaminhoCritico {\n";
+    char *descricao = " c [color=lightblue, label=\"Maior Caminho Crítico\"];\n";
     char comando[200];
 
     FILE *pArq; 
@@ -894,6 +895,35 @@ void passaCaminhoCriticoParaArquivoVisual(){
 
     pArq = fopen(arquivoFonteDot, "w");
     fprintf(pArq, formatoOrd);
+    fprintf(pArq, descricao);
+
+    do{
+        fprintf(pArq, "%s -> %s;\n", verticeCritico->VerticeAntMaiorCusto->nome, 
+                                     verticeCritico->nome);
+
+        verticeCritico = verticeCritico->VerticeAntMaiorCusto;
+    }while(verticeCritico != verticeCritico->VerticeAntMaiorCusto);
+
+    fprintf(pArq,"\n}");
+    fclose(pArq);
+
+    sprintf(comando, "dot -Tpng -O '%s'", arquivoFonteDot);
+    return system(comando);
+}
+
+void passaSegundoCaminhoCriticoParaArquivoVisual(){
+    char *arquivoFonteDot = "SegundoCaminhoCritico.dot";
+    char *formatoOrd = "digraph SegundoCaminhoCritico {\n";
+    char *descricao = " c [color=lightblue, label=\"Segundo Maior Caminho Crítico\"];\n";
+    char comando[200];
+
+    FILE *pArq; 
+    tVertice *verticeCritico = maiorESegundoMaiorCaminho.segundoMaior;
+    // int i;
+
+    pArq = fopen(arquivoFonteDot, "w");
+    fprintf(pArq, formatoOrd);
+    fprintf(pArq, descricao);
 
     do{
         fprintf(pArq, "%s -> %s;\n", verticeCritico->VerticeAntMaiorCusto->nome, 
@@ -917,7 +947,7 @@ int main() {
     lerArquivo();
     imprimirVertices(grafo->vertice);
     zeraListaOrdTop();
-    printf("Realizando ordenacao topologica... \n");
+    printf("Realizando ordenacao topologica...");
     ordenacaoTopologica();
     if (listaOrdTop.ciclo == 0) {
         mostrarListaOrdTop();
@@ -933,6 +963,7 @@ int main() {
     }
     achaVerticesComMaiorCustoDeChegadaEInsereNaStruct();
     passaCaminhoCriticoParaArquivoVisual();
+    passaSegundoCaminhoCriticoParaArquivoVisual();
     // printf(">> Caminhos críticos: \n");
     // printf("Maior: %s\n", maiorESegundoMaiorCaminho.Maior->nome);
     // printf("Segundo Maior: %s\n", maiorESegundoMaiorCaminho.segundoMaior->nome);

@@ -1,0 +1,8 @@
+digraph SegundoCaminhoCritico {
+ c [color=lightblue, label="Segundo Maior Caminho Crítico"];
+"117897" -> "117935";
+"117889" -> "117897";
+"116319" -> "117889";
+"113476" -> "116319";
+
+}

@@ -1,5 +1,6 @@
 digraph Disciplinas {
- c [color=lightblue, label="Curso: Ciência da Computação"];
+ c [color=lightblue, label="Disciplinas
+Curso: Ciência da Computação"];
 "113034" -> "113042";
 "113034" -> "115045";
 "113034" -> "117536";
