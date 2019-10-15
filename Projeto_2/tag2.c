@@ -627,11 +627,6 @@ int InsereNosVerticesOCustoDeChegada(){
         // printf("%s: %i\n", tmp_vertice->nome, tmp_vertice->custoFinalizar);
 
         tmp_vertice = tmp_vertice->prox;
-
-<<<<<<< HEAD
-        tmp_vertice = tmp_vertice->prox;
-=======
->>>>>>> 17faa3039d5d0314209f565a72d94acd4162e36f
     }
     tmp_aresta = tmpNoOrd->vertice->grafoAresta;
 

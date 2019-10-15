@@ -5,7 +5,7 @@ Hiago dos Santos Rabelo (16/0124492)
 Esta é a entrega do segundo projeto de Teoria e Aplicação de Grafos 2019.2. 
 
 AVISO
-    O programa contido no arquivo "tag1.c" foi desenvolvido em Linux (Mint 19.1), compilado e testado com o gcc mais atual. O código não utiliza nada além de algumas bibliotecas padrão.
+    O programa contido no arquivo "tag2.c" foi desenvolvido em Linux (Mint 19.1), compilado e testado com o gcc mais atual. O código utiliza bibliotecas padrão, além do pacote graphviz para gerar a visualização do grafo.
 
 COMO COMPILAR E EXECUTAR
     Não é necessário incluir nenhum parâmetro especial durante a compilação e execução do programa. Os comandos a seguir foram suficientes em uma máquina Linux com o gcc instalado.
