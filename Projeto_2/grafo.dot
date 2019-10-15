@@ -7,5 +7,6 @@ digraph Disciplinas {
 "D" -> "F";
 "E" -> "D";
 "E" -> "F";
+"G";
 
 }
