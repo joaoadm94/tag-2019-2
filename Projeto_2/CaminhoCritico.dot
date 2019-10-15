@@ -1,9 +1,0 @@
-digraph CaminhoCritico {
- c [color=lightblue, label="Maior Caminho Crítico"];
-"117935" -> "117960";
-"117897" -> "117935";
-"117889" -> "117897";
-"116319" -> "117889";
-"113476" -> "116319";
-
-}

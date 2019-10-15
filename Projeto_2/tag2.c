@@ -628,6 +628,10 @@ int InsereNosVerticesOCustoDeChegada(){
 
         tmp_vertice = tmp_vertice->prox;
 
+<<<<<<< HEAD
+        tmp_vertice = tmp_vertice->prox;
+=======
+>>>>>>> 17faa3039d5d0314209f565a72d94acd4162e36f
     }
     tmp_aresta = tmpNoOrd->vertice->grafoAresta;
 
@@ -795,6 +799,9 @@ int converteGrafoParaArquivoVisual(){
     for(i = 0; i < grafo->qtdVertices; i++){
         arestaAux = verticeAux->grafoAresta;
 
+        if (verticeAux->grauEntrada == 0 && arestaAux == NULL) {
+            fprintf(pArq, "%s;\n", verticeAux->nome);
+        }
         while(arestaAux){
             fprintf(pArq, "%s -> %s;\n", verticeAux->nome, arestaAux->atalho->nome);
             arestaAux = arestaAux->prox;
