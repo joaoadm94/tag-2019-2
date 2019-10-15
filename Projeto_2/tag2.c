@@ -624,8 +624,10 @@ int InsereNosVerticesOCustoDeChegada(){
         // tmp_vertice->CriticoAresta = NULL;
         tmp_vertice->custoFinalizar = tmp_vertice->peso;
         tmp_vertice->VerticeAntMaiorCusto = tmp_vertice;
+        // printf("%s: %i\n", tmp_vertice->nome, tmp_vertice->custoFinalizar);
 
-        tmp_vertice = grafo->vertice->prox;
+        tmp_vertice = tmp_vertice->prox;
+
     }
     tmp_aresta = tmpNoOrd->vertice->grafoAresta;
 
@@ -647,12 +649,12 @@ int InsereNosVerticesOCustoDeChegada(){
     }
     printf("\n");
     tmp_vertice = grafo->vertice;
-    for(i=0; i<grafo->qtdVertices;++i){
-        printf("Maior custo para finalizar (%s): %i\n", tmp_vertice->nome,
-                                            tmp_vertice->custoFinalizar);
-        // printf("Vértice anterior maior custo: %s\n\n", tmp_vertice->VerticeAntMaiorCusto->nome);                                    
-        tmp_vertice = tmp_vertice->prox;
-    }
+    // for(i=0; i<grafo->qtdVertices;++i){
+    //     printf("Maior custo para finalizar (%s): %i\n", tmp_vertice->nome,
+    //                                         tmp_vertice->custoFinalizar);
+    //     printf("Vértice anterior maior custo: %s\n\n", tmp_vertice->VerticeAntMaiorCusto->nome);                                    
+    //     tmp_vertice = tmp_vertice->prox;
+    // }
 
     return 0;
 }
@@ -887,17 +889,18 @@ void passaCaminhoCriticoParaArquivoVisual(){
     char comando[200];
 
     FILE *pArq; 
-    tNoOrdTop *noOrdTopAux = listaOrdTop.inicio;
-    int i;
+    tVertice *verticeCritico = maiorESegundoMaiorCaminho.Maior;
+    // int i;
 
     pArq = fopen(arquivoFonteDot, "w");
     fprintf(pArq, formatoOrd);
 
-    for(i = 0; i < grafo->qtdVertices; i++){
+    do{
+        fprintf(pArq, "%s -> %s;\n", verticeCritico->VerticeAntMaiorCusto->nome, 
+                                     verticeCritico->nome);
 
-        fprintf(pArq, "%s ;", noOrdTopAux->vertice->nome);
-        noOrdTopAux = noOrdTopAux->prox;
-    }
+        verticeCritico = verticeCritico->VerticeAntMaiorCusto;
+    }while(verticeCritico != verticeCritico->VerticeAntMaiorCusto);
 
     fprintf(pArq,"\n}");
     fclose(pArq);
@@ -928,7 +931,6 @@ int main() {
         printf("Não foi possível passar o grafo para o arquivo visual\n");
         return EXIT_FAILURE;
     }
-    mostrarListaOrdTop();
     achaVerticesComMaiorCustoDeChegadaEInsereNaStruct();
     passaCaminhoCriticoParaArquivoVisual();
     // printf(">> Caminhos críticos: \n");
