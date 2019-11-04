@@ -20,10 +20,9 @@ typedef struct arestaEscola{
 } tArestaEscola;
 
 typedef struct arestaProfessor{
-    int terminal;       // índice do vértice terminal
-    int prioridade;           // prioridade (1 = máx e assim por diante)
-    int visitado;       // 1 se já foi visitado e 0 caso contrário
-    verticeEscola *atalho;    //
+    int terminal;                       // índice do vértice terminal
+    int prioridade;                     // prioridade (1 = máx e assim por diante)
+    verticeEscola *atalho;    
     struct arestaProfessor *prox; // referencia para a prox aresta
 } tArestaProfessor;
 
@@ -37,7 +36,8 @@ typedef struct verticeEscola {
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
-    int visitado;       //
+    verticeProfessor *ProfessorRequisitado1;
+    verticeProfessor *ProfessorRequisitado2;
     tArestaEscola *ArestaParaProfessor1;  // referencia p/ a lista de arestas das opções de professores
     tArestaEscola *ArestaParaProfessor2;  // referencia p/ a lista de arestas das opções de professores
     struct verticeEscola *prox;    // referencia p/ o proximo vertice
@@ -53,7 +53,8 @@ typedef struct verticeProfessor {
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
-    int visitado;       //
+    verticeEscola *escolaQueORecebeu;
+    tArestaProfessor *ultimaEscolaAnalizada;
     tArestaProfessor *ArestaParaEscola;    // referencia p/ a lista de arestas (grafo)
     tArestaProfessor *CriticoAresta;  // referencia p/ lista de arestas (caminho crítico)
     struct verticeProfessor *prox;    // referencia p/ o proximo vertice
@@ -132,7 +133,6 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
             // auxVerticeEscola->nome;
             auxVerticeEscola->grau = 0;
             auxVerticeEscola->grauEntrada = 0;
-            auxVerticeEscola->visitado = 0;
             auxVerticeEscola->prox = NULL;
             grafo->verticeEscola = auxVerticeEscola;
         } else {
@@ -148,7 +148,6 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
                 // vertice->nome = NULL;
                 verticeEscola->grau = 0;
                 verticeEscola->grauEntrada = 0;
-                verticeEscola->visitado = 0;
                 verticeEscola->prox = NULL;
                 auxVerticeEscola->prox = verticeEscola;
                 auxVerticeEscola = verticeEscola;    
@@ -165,7 +164,6 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
             // auxVerticeProfessor->nome;
             auxVerticeProfessor->grau = 0;
             auxVerticeProfessor->grauEntrada = 0;
-            auxVerticeProfessor->visitado = 0;
             auxVerticeProfessor->prox = NULL;
             grafo->verticeProfessor = auxVerticeProfessor;
         } else {
@@ -180,7 +178,6 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
                 // vertice->nome = NULL;
                 verticeProfessor->grau = 0;
                 verticeProfessor->grauEntrada = 0;
-                verticeProfessor->visitado = 0;
                 verticeProfessor->prox = NULL;
                 auxVerticeProfessor->prox = verticeProfessor;
                 auxVerticeProfessor = verticeProfessor;    
@@ -220,8 +217,6 @@ tVerticeEscola* inserirVerticeRotulado(tVerticeEscola *anterior, int id, char ro
 }
 */
 
-
-//Erro está nessa função 
 int criarArestaEscolaParaProfessor(tVerticeEscola *verticeEscola, tVerticeProfessor *verticeProfessor, 
                                     int indiceHabilitacaoMin){
     
@@ -300,7 +295,6 @@ int criarArestaProfessorParaEscola(tVerticeProfessor *verticeProfessor,
     arestaProfessor->prioridade = prioridade;
     arestaProfessor->prox = NULL;
     arestaProfessor->terminal = 0;
-    arestaProfessor->visitado = 0;
 
     if(verticeProfessor->ArestaParaEscola == NULL) {
         verticeProfessor->ArestaParaEscola = arestaProfessor;
@@ -315,8 +309,6 @@ int criarArestaProfessorParaEscola(tVerticeProfessor *verticeProfessor,
 
     return 0;
 }
-
-
 
 int inserirArestaProfessor(tVerticeProfessor* verticeProfessor, 
                            int escolasEscolhidas[], 

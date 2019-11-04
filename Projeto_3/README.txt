@@ -17,6 +17,11 @@ DEFINIÇÃO DE PRIORIDADES
         se habilitação professor >= habilitação pedida:
             prioridade = habilitacaoProfessor - habilitacaoPedida + 1
 
+MÉTODO DE RESOLUÇÃO DO PROBLEMA
+    Utilizado o algoritmo de Gale-Shapley priorizando os professores, pois assim
+    a escola pode acabar ficando com algum professor que não possui uma priodade tão alta,
+    ou seja, com mais habilitações do que ela pediu. O que também seria bom para ela
+
 COMO COMPILAR E EXECUTAR
     Não é necessário incluir nenhum parâmetro especial durante a compilação e execução do programa. Os comandos a seguir foram suficientes em uma máquina Linux com o gcc instalado.
     
