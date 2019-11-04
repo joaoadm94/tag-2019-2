@@ -281,7 +281,6 @@ int inserirArestaEscola(tVerticeEscola* verticeEscola, int indiceHabilitacaoMin)
         if(auxVerticeProfessor->habilitacao >= verticeEscola->habilitacoesMinimas[indiceHabilitacaoMin]){
             criarArestaEscolaParaProfessor(verticeEscola, auxVerticeProfessor, indiceHabilitacaoMin);
         }
-        
         auxVerticeProfessor = auxVerticeProfessor->prox;
     }
 
@@ -341,7 +340,8 @@ int lerGrafo(FILE *arquivo) {
     const int VALORMALLOC = 140;
     char *linha = malloc(VALORMALLOC);
     char *index;
-    int id, habilitacao;
+    int id, habilitacao, x, ocorrenciasDaLetra;
+    char caractere = '(';
     int escolaEscolhida[4];
     int qtdProfessores, qtdEscolas, qtdEscolasEscolhidas, qtdProfEscolhidos, flag;
     int habilitacaoMinimaExigida[2];
@@ -411,35 +411,40 @@ int lerGrafo(FILE *arquivo) {
     printf(">>>> Professores que as escolas apontam\n");
     
     inserirArestaEscola(grafo->verticeEscola, 0);
-    
-    /*
-    printf("%d ", grafo->verticeEscola->ArestaParaProfessor1->atalho->habilitacao);
-
-    
-    if(grafo->verticeEscola->habilitacoesMinimas[1] != 0){
+    if(habilitacaoMinimaExigida[1]){
         inserirArestaEscola(grafo->verticeEscola, 1);
     }
-    */
     
-
-    // Ainda não chegou aqui....
-
-    /*
     auxVerticeEscola = grafo->verticeEscola->prox;
     qtdEscolas--;
     while (qtdEscolas > 0) {
         fgets(linha, VALORMALLOC, arquivo);
+        for(x=0, ocorrenciasDaLetra=0; x < strlen(linha); ++x)
+            if (linha[x] == caractere) ++ocorrenciasDaLetra;
+
+        if(ocorrenciasDaLetra ==3){
         sscanf(linha, "(E%d):(%d):(%d)\n", &id, &habilitacaoMinimaExigida[0],
                                                     &habilitacaoMinimaExigida[1]);
                 auxVerticeEscola->habilitacoesMinimas[0] = habilitacaoMinimaExigida[0];
                 auxVerticeEscola->habilitacoesMinimas[1] = habilitacaoMinimaExigida[1];
-        
-        // inserirArestaEscola(auxVerticeEscola, escolaEscolhida, qtdEscolasEscolhidas);
+
+        }
+        else{
+            if(ocorrenciasDaLetra ==2){
+                sscanf(linha, "(E%d):(%d)\n", &id, &habilitacaoMinimaExigida[0]);
+                auxVerticeEscola->habilitacoesMinimas[0] = habilitacaoMinimaExigida[0];
+            }
+        }
+
+        inserirArestaEscola(auxVerticeEscola, 0);
+        if(habilitacaoMinimaExigida[1]){
+            inserirArestaEscola(auxVerticeEscola, 1);
+        }
+
         auxVerticeEscola = auxVerticeEscola->prox;
         qtdEscolas--;
     }
     
-    */
     free(linha);
     return 0;
 }
@@ -573,28 +578,25 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
             //     }
             // }
             
-           
             // verticeEscola->grau = grau;
             printf("Vértice %d - Habilitações Mín[0]. \n", verticeEscola->id);
             
             auxArestaEscola = verticeEscola->ArestaParaProfessor1;            
-            while(auxArestaEscola != NULL){                      
+            while(auxArestaEscola != NULL){ 
                 printf("%d ", auxArestaEscola->atalho->id);
                 auxArestaEscola = auxArestaEscola->prox;
             }
-            
-            printf("\n");
+                printf("\n");
             if(verticeEscola->habilitacoesMinimas[1] > 0){
-                auxArestaEscola = verticeEscola->ArestaParaProfessor2;
-                printf("Mín[1]: ");
-                while(auxArestaEscola){                      
+                printf("Mín[1]: ");    
+                auxArestaEscola = verticeEscola->ArestaParaProfessor2;            
+                while(auxArestaEscola != NULL){                      
                     printf("%d ", auxArestaEscola->atalho->id);
                     auxArestaEscola = auxArestaEscola->prox;
                 }
                 printf("\n");
-            } 
-                        
-
+            }          
+                        printf("\n");
             if (verticeEscola->prox == NULL) {
                 flagVertice = 0;
             } else {
