@@ -9,7 +9,8 @@
 
 // ----------------- Definições de tipos -------------------
 typedef struct verticeEscola verticeEscola;
-typedef struct verticeEscola verticeProfessor;
+typedef struct verticeProfessor verticeProfessor;
+
 typedef struct arestaEscola{
     int terminal;       // índice do vértice terminal
     int peso;           // peso ou valor da aresta, 0 = peso padrão
@@ -37,8 +38,8 @@ typedef struct verticeEscola {
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
     int visitado;       //
-    tArestaEscola *ArestaParaProfessor1;  // referencia p/ a lista de arestas da primeira opção de professores
-    tArestaEscola *ArestaParaProfessor2;  // referencia p/ a lista de arestas da segunda opção de professores
+    tArestaEscola *ArestaParaProfessor1;  // referencia p/ a lista de arestas das opções de professores
+    tArestaEscola *ArestaParaProfessor2;  // referencia p/ a lista de arestas das opções de professores
     struct verticeEscola *prox;    // referencia p/ o proximo vertice
 } tVerticeEscola;
 
@@ -132,6 +133,7 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
             auxVerticeEscola->grau = 0;
             auxVerticeEscola->grauEntrada = 0;
             auxVerticeEscola->visitado = 0;
+            auxVerticeEscola->prox = NULL;
             grafo->verticeEscola = auxVerticeEscola;
         } else {
             printf("Não foi possível alocar memória para o vértice. Encerrando...");
@@ -147,6 +149,7 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
                 verticeEscola->grau = 0;
                 verticeEscola->grauEntrada = 0;
                 verticeEscola->visitado = 0;
+                verticeEscola->prox = NULL;
                 auxVerticeEscola->prox = verticeEscola;
                 auxVerticeEscola = verticeEscola;    
             } else {
@@ -163,6 +166,7 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
             auxVerticeProfessor->grau = 0;
             auxVerticeProfessor->grauEntrada = 0;
             auxVerticeProfessor->visitado = 0;
+            auxVerticeProfessor->prox = NULL;
             grafo->verticeProfessor = auxVerticeProfessor;
         } else {
             printf("Não foi possível alocar memória para o vértice de escolas. Encerrando...");
@@ -177,6 +181,7 @@ int inicializarGrafo(int qtdProfessores, int qtdEscolas, int qtdEscolasEscolhida
                 verticeProfessor->grau = 0;
                 verticeProfessor->grauEntrada = 0;
                 verticeProfessor->visitado = 0;
+                verticeProfessor->prox = NULL;
                 auxVerticeProfessor->prox = verticeProfessor;
                 auxVerticeProfessor = verticeProfessor;    
             } else {
@@ -215,6 +220,73 @@ tVerticeEscola* inserirVerticeRotulado(tVerticeEscola *anterior, int id, char ro
 }
 */
 
+
+//Erro está nessa função 
+int criarArestaEscolaParaProfessor(tVerticeEscola *verticeEscola, tVerticeProfessor *verticeProfessor, 
+                                    int indiceHabilitacaoMin){
+    
+    tArestaEscola *arestaEscola = (tArestaEscola *) malloc(sizeof(tArestaEscola));
+    tArestaEscola *auxArestaEscola;
+
+    if(indiceHabilitacaoMin == 0){
+        auxArestaEscola = verticeEscola->ArestaParaProfessor1;
+    }
+    else{
+        auxArestaEscola = verticeEscola->ArestaParaProfessor2;
+    }
+    // tVerticeEscola *auxVerticeEscola = verticeEscola;
+
+    if(auxArestaEscola == NULL){
+        if(indiceHabilitacaoMin == 0)
+            verticeEscola->ArestaParaProfessor1 = arestaEscola;
+        else
+            verticeEscola->ArestaParaProfessor2 = arestaEscola;
+    }
+    else{
+        while(auxArestaEscola->prox!= NULL){
+            auxArestaEscola = auxArestaEscola->prox;
+        }
+        auxArestaEscola->prox = arestaEscola;
+        
+    }
+    // auxVerticeEscola = auxVerticeEscola->prox;
+    arestaEscola->atalho = verticeProfessor;
+    arestaEscola->peso = 0;
+    arestaEscola->prox = NULL;
+    arestaEscola->terminal = 0;
+    arestaEscola->visitado = 0;
+
+    // if(verticeEscola->ArestaParaEscola == NULL) {
+    //     verticeEscola->ArestaParaEscola = arestaEscola;
+    // } else {
+    //     auxArestaEscola = verticeEscola->ArestaParaEscola;
+    //     while(auxArestaEscola->prox != NULL) {
+    //         auxArestaEscola = auxArestaEscola->prox;
+    //     }
+    //     auxArestaEscola->prox = arestaEscola;
+    // }
+    // printf(">>>> %d", arestaProfessor->);
+    
+    return 0;
+}
+
+
+
+int inserirArestaEscola(tVerticeEscola* verticeEscola, int indiceHabilitacaoMin){
+
+    tVerticeProfessor* auxVerticeProfessor = grafo->verticeProfessor;
+    int i;
+
+    for(i = 0; i < grafo->qtdProfessores; i++){
+        if(auxVerticeProfessor->habilitacao >= verticeEscola->habilitacoesMinimas[indiceHabilitacaoMin]){
+            criarArestaEscolaParaProfessor(verticeEscola, auxVerticeProfessor, indiceHabilitacaoMin);
+        }
+        
+        auxVerticeProfessor = auxVerticeProfessor->prox;
+    }
+
+    return 0;
+}
 
 int criarArestaProfessorParaEscola(tVerticeProfessor *verticeProfessor, 
                                     int escolaEscolhida) {
@@ -322,6 +394,7 @@ int lerGrafo(FILE *arquivo) {
 
     // Arestas de escolas para professores
     
+    
     flag = 1;
 
     while (flag && fgets(linha, VALORMALLOC, arquivo)) {
@@ -334,10 +407,24 @@ int lerGrafo(FILE *arquivo) {
                 grafo->verticeEscola->habilitacoesMinimas[1] = habilitacaoMinimaExigida[1];
         }
     }
+    
+    printf(">>>> Professores que as escolas apontam\n");
+    
+    inserirArestaEscola(grafo->verticeEscola, 0);
+    
+    /*
+    printf("%d ", grafo->verticeEscola->ArestaParaProfessor1->atalho->habilitacao);
 
     
-    // inserirArestaProfessor(grafo->verticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
+    if(grafo->verticeEscola->habilitacoesMinimas[1] != 0){
+        inserirArestaEscola(grafo->verticeEscola, 1);
+    }
+    */
+    
 
+    // Ainda não chegou aqui....
+
+    /*
     auxVerticeEscola = grafo->verticeEscola->prox;
     qtdEscolas--;
     while (qtdEscolas > 0) {
@@ -347,12 +434,12 @@ int lerGrafo(FILE *arquivo) {
                 auxVerticeEscola->habilitacoesMinimas[0] = habilitacaoMinimaExigida[0];
                 auxVerticeEscola->habilitacoesMinimas[1] = habilitacaoMinimaExigida[1];
         
-        // inserirArestaProfessor(auxVerticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
+        // inserirArestaEscola(auxVerticeEscola, escolaEscolhida, qtdEscolasEscolhidas);
         auxVerticeEscola = auxVerticeEscola->prox;
         qtdEscolas--;
     }
     
-    
+    */
     free(linha);
     return 0;
 }
@@ -457,36 +544,57 @@ int lerArquivo() {
 
 // Função para imprimir na tela os vértices das Escolas
 void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
-    tArestaEscola *aresta1;
-    tArestaEscola *aresta2;
-    int grau, flagVertice = 1, flagAresta = 1;
+    
+    tArestaEscola *auxArestaEscola; 
+    int flagVertice;
+
+    flagVertice = 1;
+                                                                    
     
     if (verticeEscola == NULL) {
         printf("Grafo vazio!\n");
     } else {
         // laço para percorrer os vértices
         while (flagVertice) {
-            grau = 0;
-            /*
-            if (verticeEscola->ArestaParaProfessor != NULL) {
-                aresta1 = verticeEscola->ArestaParaProfessor1;
-                aresta2 = verticeEscola->ArestaParaProfessor2;
-                // laço para percorrer as arestas do vértice
-                flagAresta = 1;
-                while (flagAresta) {
-                    grau++;
-                    if (aresta1->prox == NULL) {
-                        flagAresta = 0;
-                    } else {
-                        aresta = aresta->prox;
-                    }
-                }
+            
+            
+            // if (verticeEscola->ArestaParaProfessor != NULL) {
+            //     aresta1 = verticeEscola->ArestaParaProfessor1;
+            //     aresta2 = verticeEscola->ArestaParaProfessor2;
+            //     // laço para percorrer as arestas do vértice
+            //     flagAresta = 1;
+            //     while (flagAresta) {
+            //         grau++;
+            //         if (aresta1->prox == NULL) {
+            //             flagAresta = 0;
+            //         } else {
+            //             aresta = aresta->prox;
+            //         }
+            //     }
+            // }
+            
+           
+            // verticeEscola->grau = grau;
+            printf("Vértice %d - Habilitações Mín[0]. \n", verticeEscola->id);
+            
+            auxArestaEscola = verticeEscola->ArestaParaProfessor1;            
+            while(auxArestaEscola != NULL){                      
+                printf("%d ", auxArestaEscola->atalho->id);
+                auxArestaEscola = auxArestaEscola->prox;
             }
-            */
-            verticeEscola->grau = grau;
-            printf("Vértice %d - Habilitações Mín. %d %d \n", verticeEscola->id, 
-                                                                    verticeEscola->habilitacoesMinimas[0],                      
-                                                                    verticeEscola->habilitacoesMinimas[1]);
+            
+            printf("\n");
+            if(verticeEscola->habilitacoesMinimas[1] > 0){
+                auxArestaEscola = verticeEscola->ArestaParaProfessor2;
+                printf("Mín[1]: ");
+                while(auxArestaEscola){                      
+                    printf("%d ", auxArestaEscola->atalho->id);
+                    auxArestaEscola = auxArestaEscola->prox;
+                }
+                printf("\n");
+            } 
+                        
+
             if (verticeEscola->prox == NULL) {
                 flagVertice = 0;
             } else {
@@ -494,6 +602,7 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
             }
         }
     }
+    
 }
 
 
