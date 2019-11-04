@@ -274,6 +274,7 @@ int lerGrafo(FILE *arquivo) {
     //int origem, destino, peso;
     char rotulo[20] = ""; 
     tVerticeEscola *verticeEscola, *auxVerticeEscola;
+    tVerticeProfessor *auxVerticeProfessor;
 
     flag = 1;
 
@@ -287,28 +288,35 @@ int lerGrafo(FILE *arquivo) {
             }
         }
     }
-
-    /*
-    // auxVerticeProfessor = NULL;
-    fgets(linha, 20, arquivo);
-    sscanf(linha, "(P%d, %d): (E%d, E%d, E%d, E%d)%d %s %d\n", &id, &habilitacao, &escolaEscolhida[0], 
-                &escolaEscolhida[1], &escolaEscolhida[2], &escolaEscolhida[3]);
-    grafo->verticeProfessor->habilitacao = habilitacao;
     
+    flag = 1;
+
+    while (flag && fgets(linha, 100, arquivo)) {
+        index = linha;
+        if (*index != '/' && *index != '\n') {
+            flag = 0;
+            sscanf(linha, "(P%d, %d): (E%d, E%d, E%d, E%d)\n", &id, &habilitacao, &escolaEscolhida[0], 
+                &escolaEscolhida[1], &escolaEscolhida[2], &escolaEscolhida[3]);
+                grafo->verticeProfessor->habilitacao = habilitacao;
+        }
+    }
+
     inserirArestaProfessor(grafo->verticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
-    // vertice = inserirVerticeRotulado(auxVerticeEscola, id, rotulo, peso);
-    // grafo->vertice = vertice;
-    // auxVerticeEscola = vertice;
+
+    auxVerticeProfessor = grafo->verticeProfessor->prox;
     qtdProfessores--;
     while (qtdProfessores > 0) {
         fgets(linha, 100, arquivo);
-        sscanf(linha, "%d %s %d", &id, rotulo, &peso);
-        vertice = inserirVerticeRotulado(auxVerticeEscola, id, rotulo, peso);
-        auxVerticeEscola = vertice;
+        sscanf(linha, "(P%d, %d): (E%d, E%d, E%d, E%d)\n", &id, &habilitacao, &escolaEscolhida[0], 
+                &escolaEscolhida[1], &escolaEscolhida[2], &escolaEscolhida[3]);
+                auxVerticeProfessor->habilitacao = habilitacao;
+        
+        // inserirArestaProfessor(grafo->verticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
+        auxVerticeProfessor = auxVerticeProfessor->prox;
         qtdProfessores--;
     }
 
-    
+    /*
     while (fgets(linha, 100, arquivo)) {
         sscanf(linha, "%d %d", &origem, &destino);
         //conferir peso
