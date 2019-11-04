@@ -29,6 +29,7 @@ typedef struct arestaProfessor{
 typedef struct verticeEscola {
     int id;             // id do vértice
     int grau;           // grau do vértice
+    int emparelhado;    // 0 se não foi emparelhado ainda
     int grauEntrada;    // grau de entrada do vertices
     int habilitacoesMinimas[2]; //habilitações mínimas, se não tiver a segunda fica como zero
     int custoFinalizar; // maior custo para se chegar e finalizar esse vértice (dag)
@@ -54,7 +55,7 @@ typedef struct verticeProfessor {
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
     verticeEscola *escolaQueORecebeu;
-    tArestaProfessor *ultimaEscolaAnalizada;
+    verticeEscola *atualEscolaASerAnalizada;
     tArestaProfessor *ArestaParaEscola;    // referencia p/ a lista de arestas (grafo)
     tArestaProfessor *CriticoAresta;  // referencia p/ lista de arestas (caminho crítico)
     struct verticeProfessor *prox;    // referencia p/ o proximo vertice
@@ -1237,6 +1238,38 @@ void passaSegundoCaminhoCriticoParaArquivoVisual(){
     return system(comando);
 }
 */
+
+void matchEstavel(){
+    int i, x;
+    tVerticeEscola * auxVerticeEscola = grafo->verticeEscola;
+    tVerticeProfessor * auxVerticeProfessor = grafo->verticeProfessor;
+
+    for(i=0; i<grafo->qtdEscolas; ++i){
+        auxVerticeEscola->ProfessorRequisitado1 = NULL;
+        auxVerticeEscola->ProfessorRequisitado2 = NULL;
+    }
+    for(i=0; i<grafo->qtdProfessores; ++i){
+        auxVerticeProfessor->escolaQueORecebeu = NULL;
+        auxVerticeProfessor->atualEscolaASerAnalizada = auxVerticeProfessor->ArestaParaEscola->atalho;
+    }
+    
+    auxVerticeEscola = grafo->verticeEscola;
+    auxVerticeProfessor = grafo->verticeProfessor;
+    
+    for(i=0; i < grafo->qtdProfessores; ++i){
+        if(auxVerticeProfessor->escolaQueORecebeu != NULL || auxVerticeProfessor->atualEscolaASerAnalizada == NULL){
+            auxVerticeProfessor = auxVerticeProfessor->prox;
+            continue;
+        }
+        
+        
+        
+        if(auxVerticeProfessor->ArestaParaEscola->atalho->habilitacoesMinimas[0] <= auxVerticeProfessor->habilitacao){
+            printf("tem que fazer pra segunda vaga também");
+        }
+
+        }
+}
 
 // Funcao principal do programa
 int main() {

@@ -16,6 +16,8 @@ DEFINIÇÃO DE PRIORIDADES
     Conta:
         se habilitação professor >= habilitação pedida:
             prioridade = habilitacaoProfessor - habilitacaoPedida + 1
+    
+    Sendo que a prioridade começa do 1 e conforme o valor vai aumentando a prioridade diminui
 
 MÉTODO DE RESOLUÇÃO DO PROBLEMA
     Utilizado o algoritmo de Gale-Shapley priorizando os professores, pois assim
