@@ -266,19 +266,23 @@ int inserirArestaProfessor(tVerticeProfessor* verticeProfessor,
 
 
 int lerGrafo(FILE *arquivo) {
-    char *linha = malloc(100);
+    const int VALORMALLOC = 140;
+    char *linha = malloc(VALORMALLOC);
     char *index;
     int id, habilitacao;
     int escolaEscolhida[4];
     int qtdProfessores, qtdEscolas, qtdEscolasEscolhidas, qtdProfEscolhidos, flag;
+    int habilitacaoMinimaExigida[2];
     //int origem, destino, peso;
     char rotulo[20] = ""; 
     tVerticeEscola *verticeEscola, *auxVerticeEscola;
     tVerticeProfessor *auxVerticeProfessor;
 
+    // Arestas de professores para escolas
+
     flag = 1;
 
-    while (flag && fgets(linha, 100, arquivo)) {
+    while (flag && fgets(linha, VALORMALLOC, arquivo)) {
         index = linha;
         if (*index != '/' && *index != '\n') {
             flag = 0;
@@ -291,7 +295,7 @@ int lerGrafo(FILE *arquivo) {
     
     flag = 1;
 
-    while (flag && fgets(linha, 100, arquivo)) {
+    while (flag && fgets(linha, VALORMALLOC, arquivo)) {
         index = linha;
         if (*index != '/' && *index != '\n') {
             flag = 0;
@@ -306,7 +310,7 @@ int lerGrafo(FILE *arquivo) {
     auxVerticeProfessor = grafo->verticeProfessor->prox;
     qtdProfessores--;
     while (qtdProfessores > 0) {
-        fgets(linha, 100, arquivo);
+        fgets(linha, VALORMALLOC, arquivo);
         sscanf(linha, "(P%d, %d): (E%d, E%d, E%d, E%d)\n", &id, &habilitacao, &escolaEscolhida[0], 
                 &escolaEscolhida[1], &escolaEscolhida[2], &escolaEscolhida[3]);
                 auxVerticeProfessor->habilitacao = habilitacao;
@@ -316,13 +320,39 @@ int lerGrafo(FILE *arquivo) {
         qtdProfessores--;
     }
 
-    /*
-    while (fgets(linha, 100, arquivo)) {
-        sscanf(linha, "%d %d", &origem, &destino);
-        //conferir peso
-        inserirArestaProfessor(origem, destino, direcionado);
+    // Arestas de escolas para professores
+    
+    flag = 1;
+
+    while (flag && fgets(linha, VALORMALLOC, arquivo)) {
+        index = linha;
+        if (*index != '/' && *index != '\n') {
+            flag = 0;
+            sscanf(linha, "(E%d):(%d):(%d)\n", &id, &habilitacaoMinimaExigida[0],
+                                                    &habilitacaoMinimaExigida[1]);
+                grafo->verticeEscola->habilitacoesMinimas[0] = habilitacaoMinimaExigida[0];
+                grafo->verticeEscola->habilitacoesMinimas[1] = habilitacaoMinimaExigida[1];
+        }
     }
-    */
+
+    
+    // inserirArestaProfessor(grafo->verticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
+
+    auxVerticeEscola = grafo->verticeEscola->prox;
+    qtdEscolas--;
+    while (qtdEscolas > 0) {
+        fgets(linha, VALORMALLOC, arquivo);
+        sscanf(linha, "(E%d):(%d):(%d)\n", &id, &habilitacaoMinimaExigida[0],
+                                                    &habilitacaoMinimaExigida[1]);
+                auxVerticeEscola->habilitacoesMinimas[0] = habilitacaoMinimaExigida[0];
+                auxVerticeEscola->habilitacoesMinimas[1] = habilitacaoMinimaExigida[1];
+        
+        // inserirArestaProfessor(auxVerticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
+        auxVerticeEscola = auxVerticeEscola->prox;
+        qtdEscolas--;
+    }
+    
+    
     free(linha);
     return 0;
 }
@@ -454,10 +484,9 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
             }
             */
             verticeEscola->grau = grau;
-            printf("Vértice %d - Grau %d - Entrada %d - Peso %d\n", verticeEscola->id, 
-                                                                    verticeEscola->grau, 
-                                                                    verticeEscola->grauEntrada,
-                                                                    verticeEscola->peso);
+            printf("Vértice %d - Habilitações Mín. %d %d \n", verticeEscola->id, 
+                                                                    verticeEscola->habilitacoesMinimas[0],                      
+                                                                    verticeEscola->habilitacoesMinimas[1]);
             if (verticeEscola->prox == NULL) {
                 flagVertice = 0;
             } else {
