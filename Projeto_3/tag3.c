@@ -239,8 +239,9 @@ int criarArestaProfessorParaEscola(tVerticeProfessor *verticeProfessor,
         while(auxArestaProfessor->prox != NULL) {
             auxArestaProfessor = auxArestaProfessor->prox;
         }
-        arestaProfessor->prox = arestaProfessor;
+        auxArestaProfessor->prox = arestaProfessor;
     }
+    // printf(">>>> %d", arestaProfessor->);
 
     return 0;
 }
@@ -251,7 +252,6 @@ int inserirArestaProfessor(tVerticeProfessor* verticeProfessor,
                            int escolasEscolhidas[], 
                            int qtdeEscolasEscolhidas) {
 
-    tVerticeProfessor *vertice, *verticeOrigem = NULL, *verticeDestino = NULL;
     tArestaProfessor* auxArestaProfessor;
     int i;
     // int flagOrigem = 1, flagDestino = 1;
@@ -311,7 +311,7 @@ int lerGrafo(FILE *arquivo) {
                 &escolaEscolhida[1], &escolaEscolhida[2], &escolaEscolhida[3]);
                 auxVerticeProfessor->habilitacao = habilitacao;
         
-        // inserirArestaProfessor(grafo->verticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
+        inserirArestaProfessor(auxVerticeProfessor, escolaEscolhida, qtdEscolasEscolhidas);
         auxVerticeProfessor = auxVerticeProfessor->prox;
         qtdProfessores--;
     }
@@ -494,11 +494,14 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
             }
             */
             
-            printf("Vértice %d - Habilitação %d - Entrada %d - Peso %d\n", verticeProfessor->id, 
+            printf("Vértice %d - Habilitação %d - Aresta para escola: %d %d %d %d \n", verticeProfessor->id, 
                                                                     verticeProfessor->habilitacao, 
-                                                                    verticeProfessor->grauEntrada,
-                                                                    verticeProfessor->peso);
+                                                                    verticeProfessor->ArestaParaEscola->atalho->id,
+                                                                    verticeProfessor->ArestaParaEscola->prox->atalho->id,
+                                                                    verticeProfessor->ArestaParaEscola->prox->prox->atalho->id,
+                                                                    verticeProfessor->ArestaParaEscola->prox->prox->prox->atalho->id);
             
+
             verticeProfessor = verticeProfessor->prox;
         }
     }
