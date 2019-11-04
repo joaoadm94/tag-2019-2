@@ -574,20 +574,20 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
             
             auxArestaEscola = verticeEscola->ArestaParaProfessor1;            
             while(auxArestaEscola != NULL){ 
-                printf("%d prior: %d -", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
+                printf("%d prior: %d - ", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
                 auxArestaEscola = auxArestaEscola->prox;
             }
-                printf("\n");
+                printf("\n\n");
             if(verticeEscola->habilitacoesMinimas[1] > 0){
                 printf("Mín[1]: ");    
                 auxArestaEscola = verticeEscola->ArestaParaProfessor2;            
                 while(auxArestaEscola != NULL){                      
-                    printf("%d prior: %d -", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
+                    printf("%d prior: %d - ", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
                     auxArestaEscola = auxArestaEscola->prox;
                 }
                 printf("\n");
             }          
-                        printf("\n");
+            printf("\n");
             if (verticeEscola->prox == NULL) {
                 flagVertice = 0;
             } else {
