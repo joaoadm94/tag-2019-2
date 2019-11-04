@@ -55,7 +55,7 @@ typedef struct verticeProfessor {
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
     verticeEscola *escolaQueORecebeu;
-    tArestaProfessor *ultimaEscolaAnalizada;
+    verticeEscola *atualEscolaASerAnalizada;
     tArestaProfessor *ArestaParaEscola;    // referencia p/ a lista de arestas (grafo)
     tArestaProfessor *CriticoAresta;  // referencia p/ lista de arestas (caminho crítico)
     struct verticeProfessor *prox;    // referencia p/ o proximo vertice
@@ -1240,7 +1240,7 @@ void passaSegundoCaminhoCriticoParaArquivoVisual(){
 */
 
 void matchEstavel(){
-    int i, x, primeiraRodada;
+    int i, x;
     tVerticeEscola * auxVerticeEscola = grafo->verticeEscola;
     tVerticeProfessor * auxVerticeProfessor = grafo->verticeProfessor;
 
@@ -1248,40 +1248,27 @@ void matchEstavel(){
         auxVerticeEscola->ProfessorRequisitado1 = NULL;
         auxVerticeEscola->ProfessorRequisitado2 = NULL;
     }
-    for(i=0; i<grafo->qtdProfessores; ++i)
+    for(i=0; i<grafo->qtdProfessores; ++i){
         auxVerticeProfessor->escolaQueORecebeu = NULL;
+        auxVerticeProfessor->atualEscolaASerAnalizada = auxVerticeProfessor->ArestaParaEscola->atalho;
+    }
     
     auxVerticeEscola = grafo->verticeEscola;
     auxVerticeProfessor = grafo->verticeProfessor;
     
-    for(i=0, primeiraRodada=1; i < grafo->qtdProfessores; ++i, ++primeiraRodada){
-        if(auxVerticeProfessor->escolaQueORecebeu != NULL || auxVerticeProfessor->ultimaEscolaAnalizada->prox == NULL){
+    for(i=0; i < grafo->qtdProfessores; ++i){
+        if(auxVerticeProfessor->escolaQueORecebeu != NULL || auxVerticeProfessor->atualEscolaASerAnalizada == NULL){
             auxVerticeProfessor = auxVerticeProfessor->prox;
             continue;
         }
         
-        if(primeiraRodada == 1){
-            aux   
-        }
+        
         
         if(auxVerticeProfessor->ArestaParaEscola->atalho->habilitacoesMinimas[0] <= auxVerticeProfessor->habilitacao){
-            
-        }
-
-        if(){
-            i=0;
-            continue;
+            printf("tem que fazer pra segunda vaga também");
         }
 
         }
-        
-        
-        
-
-    }
-    
-    
-
 }
 
 // Funcao principal do programa
