@@ -2,16 +2,26 @@ Teoria e aplicação de grafos - Turma A - 2019/2
 João Antonio Desiderio de Moraes (16/0126975)
 Hiago dos Santos Rabelo (16/0124492)
 
-Esta é a entrega do segundo projeto de Teoria e Aplicação de Grafos 2019.2. 
+Esta é a entrega do terceiro projeto de Teoria e Aplicação de Grafos 2019.2. 
 
 AVISO
-    O programa contido no arquivo "tag2.c" foi desenvolvido em Linux (Mint 19.1), compilado e testado com o gcc mais atual. O código utiliza bibliotecas padrão, além do pacote graphviz para gerar a visualização do grafo.
+    O programa contido no arquivo "tag3.c" foi desenvolvido em Linux (Mint 19.1), compilado e testado com o gcc mais atual. O código utiliza bibliotecas padrão.
+
+DEFINIÇÃO DE PRIORIDADES
+    Os professores já possuem definidas as prioridades das escolas que desejam trabalhar
+    As escolas podem receber tanto algum professor com x de habilitação ou mais, porém
+    se a habilitação for maior do que a que ele precisa não será prioridade 1, uma vez
+    que quanto maior a habilitação mais difícil é de arrumar esse professor. Logo têm 
+    escolas que precisam mais deste professor.
+    Conta:
+        se habilitação professor >= habilitação pedida:
+            prioridade = habilitacaoProfessor - habilitacaoPedida + 1
 
 COMO COMPILAR E EXECUTAR
     Não é necessário incluir nenhum parâmetro especial durante a compilação e execução do programa. Os comandos a seguir foram suficientes em uma máquina Linux com o gcc instalado.
     
-    gcc -o tag1 tag1.c
-    ./tag1
+    gcc -o tag3 tag3.c
+    ./tag3
 
 SOBRE O PROGRAMA
     O arquivo "tag1.c" contém o código de um programa capaz de abrir o arquivo "soc-dolphins.mtx" e montar um grafo a partir de seu conteúdo. O programa pode ser adaptado para ter maior versatilidade na abertura de arquivos, mas foi limitado a este arquivo para garantir uma execução sem imprevistos.

@@ -13,7 +13,7 @@ typedef struct verticeProfessor verticeProfessor;
 
 typedef struct arestaEscola{
     int terminal;       // índice do vértice terminal
-    int peso;           // peso ou valor da aresta, 0 = peso padrão
+    int prioridade;           // prioridade (1 = máx e assim por diante)
     int visitado;       // 1 se já foi visitado e 0 caso contrário
     verticeProfessor *atalho;    //
     struct arestaEscola *prox; // referencia para a prox aresta
@@ -21,7 +21,7 @@ typedef struct arestaEscola{
 
 typedef struct arestaProfessor{
     int terminal;       // índice do vértice terminal
-    int peso;           // peso ou valor da aresta, 0 = peso padrão
+    int prioridade;           // prioridade (1 = máx e assim por diante)
     int visitado;       // 1 se já foi visitado e 0 caso contrário
     verticeEscola *atalho;    //
     struct arestaProfessor *prox; // referencia para a prox aresta
@@ -206,7 +206,7 @@ tVerticeEscola* inserirVerticeRotulado(tVerticeEscola *anterior, int id, char ro
         vertice->grauEntrada = 0;
         strcpy(vertice->nome, rotulo);
         vertice->prox = NULL;
-        vertice->peso = peso;
+        vertice->prioridade = peso;
         vertice->visitado = 0;
     } else {
         printf("Não foi possível alocar memória para o vértice. Encerrando...");
@@ -247,11 +247,10 @@ int criarArestaEscolaParaProfessor(tVerticeEscola *verticeEscola, tVerticeProfes
             auxArestaEscola = auxArestaEscola->prox;
         }
         auxArestaEscola->prox = arestaEscola;
-        
     }
     // auxVerticeEscola = auxVerticeEscola->prox;
     arestaEscola->atalho = verticeProfessor;
-    arestaEscola->peso = 0;
+    arestaEscola->prioridade = verticeProfessor->habilitacao - verticeEscola->habilitacoesMinimas[indiceHabilitacaoMin] +1;
     arestaEscola->prox = NULL;
     arestaEscola->terminal = 0;
     arestaEscola->visitado = 0;
@@ -288,7 +287,7 @@ int inserirArestaEscola(tVerticeEscola* verticeEscola, int indiceHabilitacaoMin)
 }
 
 int criarArestaProfessorParaEscola(tVerticeProfessor *verticeProfessor, 
-                                    int escolaEscolhida) {
+                                    int escolaEscolhida, int prioridade) {
     tArestaProfessor *arestaProfessor = (tArestaProfessor *) malloc(sizeof(tArestaProfessor));
     tArestaProfessor *auxArestaProfessor;
     tVerticeEscola *auxVerticeEscola = grafo->verticeEscola;
@@ -298,7 +297,7 @@ int criarArestaProfessorParaEscola(tVerticeProfessor *verticeProfessor,
     }
 
     arestaProfessor->atalho = auxVerticeEscola;
-    arestaProfessor->peso = 0;
+    arestaProfessor->prioridade = prioridade;
     arestaProfessor->prox = NULL;
     arestaProfessor->terminal = 0;
     arestaProfessor->visitado = 0;
@@ -329,7 +328,7 @@ int inserirArestaProfessor(tVerticeProfessor* verticeProfessor,
 
     // vertice = grafo->verticeProfessor;
     for(i = 0; i < qtdeEscolasEscolhidas; i++){
-        criarArestaProfessorParaEscola(verticeProfessor, escolasEscolhidas[i]);
+        criarArestaProfessorParaEscola(verticeProfessor, escolasEscolhidas[i], i+1);
     }
 
     return 0;
@@ -579,11 +578,11 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
             // }
             
             // verticeEscola->grau = grau;
-            printf("Vértice %d - Habilitações Mín[0]. \n", verticeEscola->id);
+            printf("Escola %d - Habilitações Mín[0]. \n", verticeEscola->id);
             
             auxArestaEscola = verticeEscola->ArestaParaProfessor1;            
             while(auxArestaEscola != NULL){ 
-                printf("%d ", auxArestaEscola->atalho->id);
+                printf("%d prior: %d -", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
                 auxArestaEscola = auxArestaEscola->prox;
             }
                 printf("\n");
@@ -591,7 +590,7 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
                 printf("Mín[1]: ");    
                 auxArestaEscola = verticeEscola->ArestaParaProfessor2;            
                 while(auxArestaEscola != NULL){                      
-                    printf("%d ", auxArestaEscola->atalho->id);
+                    printf("%d prior: %d -", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
                     auxArestaEscola = auxArestaEscola->prox;
                 }
                 printf("\n");
@@ -634,12 +633,16 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
             }
             */
             
-            printf("Vértice %d - Habilitação %d - Aresta para escola: %d %d %d %d \n", verticeProfessor->id, 
+            printf("Vértice %d - Habilitação %d - Preferência de escola: %d %d %d %d - priorid %d %d %d %d \n\n", verticeProfessor->id, 
                                                                     verticeProfessor->habilitacao, 
                                                                     verticeProfessor->ArestaParaEscola->atalho->id,
                                                                     verticeProfessor->ArestaParaEscola->prox->atalho->id,
                                                                     verticeProfessor->ArestaParaEscola->prox->prox->atalho->id,
-                                                                    verticeProfessor->ArestaParaEscola->prox->prox->prox->atalho->id);
+                                                                    verticeProfessor->ArestaParaEscola->prox->prox->prox->atalho->id,
+                                                                    verticeProfessor->ArestaParaEscola->prioridade,
+                                                                    verticeProfessor->ArestaParaEscola->prox->prioridade,
+                                                                    verticeProfessor->ArestaParaEscola->prox->prox->prioridade,
+                                                                    verticeProfessor->ArestaParaEscola->prox->prox->prox->prioridade);
             
 
             verticeProfessor = verticeProfessor->prox;
@@ -901,7 +904,7 @@ int InsereNosVerticesOCustoDeChegada(){
 
     for(i=0; i<grafo->qtdVertices; ++i){
         // tmp_vertice->CriticoAresta = NULL;
-        tmp_vertice->custoFinalizar = tmp_vertice->peso;
+        tmp_vertice->custoFinalizar = tmp_vertice->prioridade;
         tmp_vertice->VerticeAntMaiorCusto = tmp_vertice;
         // printf("%s: %i\n", tmp_vertice->nome, tmp_vertice->custoFinalizar);
 
@@ -915,7 +918,7 @@ int InsereNosVerticesOCustoDeChegada(){
 
         
         while(tmp_aresta){
-            aux_custo = tmp_aresta->atalho->peso + tmpNoOrd->vertice->custoFinalizar;
+            aux_custo = tmp_aresta->atalho->prioridade + tmpNoOrd->vertice->custoFinalizar;
             // printf("%d ", aux_custo);
             if(tmp_aresta->atalho->custoFinalizar < aux_custo){
                 tmp_aresta->atalho->custoFinalizar = aux_custo;
