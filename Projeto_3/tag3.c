@@ -10,6 +10,8 @@
 // ----------------- Definições de tipos -------------------
 typedef struct verticeEscola verticeEscola;
 typedef struct verticeProfessor verticeProfessor;
+// typedef struct arestaEscola arestaEscola;
+// typedef struct arestaProfessor verticeProfessor;
 
 typedef struct arestaEscola{
     int terminal;       // índice do vértice terminal
@@ -55,7 +57,7 @@ typedef struct verticeProfessor {
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
     verticeEscola *escolaQueORecebeu;
-    verticeEscola *atualEscolaASerAnalizada;
+    tArestaProfessor *atualEscolaASerAnalizada;
     tArestaProfessor *ArestaParaEscola;    // referencia p/ a lista de arestas (grafo)
     tArestaProfessor *CriticoAresta;  // referencia p/ lista de arestas (caminho crítico)
     struct verticeProfessor *prox;    // referencia p/ o proximo vertice
@@ -637,6 +639,8 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
                                                                     verticeProfessor->ArestaParaEscola->prox->prox->prioridade,
                                                                     verticeProfessor->ArestaParaEscola->prox->prox->prox->prioridade);
             
+            printf("Prof %d Escola - %d", verticeProfessor->id,
+                                          verticeProfessor->escolaQueORecebeu->id);
 
             verticeProfessor = verticeProfessor->prox;
         }
@@ -1241,35 +1245,54 @@ void passaSegundoCaminhoCriticoParaArquivoVisual(){
 
 void matchEstavel(){
     int i, x;
-    tVerticeEscola * auxVerticeEscola = grafo->verticeEscola;
-    tVerticeProfessor * auxVerticeProfessor = grafo->verticeProfessor;
+    verticeEscola *auxVerticeEscola = grafo->verticeEscola;
+    verticeProfessor *auxVerticeProfessor = grafo->verticeProfessor;
+    tArestaProfessor *auxArestaEscola;
 
     for(i=0; i<grafo->qtdEscolas; ++i){
         auxVerticeEscola->ProfessorRequisitado1 = NULL;
         auxVerticeEscola->ProfessorRequisitado2 = NULL;
+        auxVerticeEscola = auxVerticeEscola->prox;
     }
+    auxVerticeEscola = grafo->verticeEscola;
+
     for(i=0; i<grafo->qtdProfessores; ++i){
         auxVerticeProfessor->escolaQueORecebeu = NULL;
-        auxVerticeProfessor->atualEscolaASerAnalizada = auxVerticeProfessor->ArestaParaEscola->atalho;
+        auxVerticeProfessor->atualEscolaASerAnalizada = auxVerticeProfessor->ArestaParaEscola;
+        auxVerticeProfessor = auxVerticeProfessor->prox;
     }
     
-    auxVerticeEscola = grafo->verticeEscola;
     auxVerticeProfessor = grafo->verticeProfessor;
-    
     for(i=0; i < grafo->qtdProfessores; ++i){
         if(auxVerticeProfessor->escolaQueORecebeu != NULL || auxVerticeProfessor->atualEscolaASerAnalizada == NULL){
             auxVerticeProfessor = auxVerticeProfessor->prox;
             continue;
         }
         
-        
-        
-        if(auxVerticeProfessor->ArestaParaEscola->atalho->habilitacoesMinimas[0] <= auxVerticeProfessor->habilitacao){
-            printf("tem que fazer pra segunda vaga também");
+        auxArestaEscola = auxVerticeProfessor->atualEscolaASerAnalizada;
+        while((auxArestaEscola && auxArestaEscola->atalho->habilitacoesMinimas[0] > auxVerticeProfessor->habilitacao)){
+            auxArestaEscola = auxArestaEscola->prox;
+        }
+        if(auxArestaEscola == NULL){
+            auxVerticeProfessor->atualEscolaASerAnalizada = NULL;
+            continue;
+        }
+        if(auxArestaEscola->atalho->ProfessorRequisitado1 == NULL){
+            auxArestaEscola->atalho->ProfessorRequisitado1 = auxVerticeProfessor;
+        }
+        else{
+           if((auxArestaEscola->atalho->ProfessorRequisitado1->habilitacao - 
+           auxArestaEscola->atalho->habilitacoesMinimas[0] + 1) > 
+           (auxVerticeProfessor->habilitacao - auxArestaEscola->atalho->habilitacoesMinimas[0] + 1)){
+               auxArestaEscola->atalho->ProfessorRequisitado1->escolaQueORecebeu = NULL;
+               auxArestaEscola->atalho->ProfessorRequisitado1 = auxVerticeProfessor;
+               auxVerticeProfessor->escolaQueORecebeu = auxArestaEscola->atalho;
+           }
+        }
+            // printf("tem que fazer pra segunda vaga também");
         }
 
         }
-}
 
 // Funcao principal do programa
 int main() {
@@ -1277,6 +1300,7 @@ int main() {
     printf("---- João Antonio Desiderio de Moraes (16/0126975) ----\n");
     printf("---- Hiago dos Santos Rabelo (16/0124492) ----\n\n");
     lerArquivo();
+    matchEstavel();
     imprimirVerticesProfessores(grafo->verticeProfessor);
     imprimirVerticesEscola(grafo->verticeEscola);
     // zeraListaOrdTop();
