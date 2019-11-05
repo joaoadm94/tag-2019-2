@@ -401,9 +401,7 @@ int lerGrafo(FILE *arquivo) {
                 grafo->verticeEscola->habilitacoesMinimas[1] = habilitacaoMinimaExigida[1];
         }
     }
-    
-    printf(">>>> Professores que as escolas apontam\n");
-    
+        
     inserirArestaEscola(grafo->verticeEscola, 0);
     if(habilitacaoMinimaExigida[1]){
         inserirArestaEscola(grafo->verticeEscola, 1);
@@ -573,6 +571,9 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
             // }
             
             // verticeEscola->grau = grau;
+            if(verticeEscola->ProfessorRequisitado1)
+                printf("Escola %d Professor %d-", verticeEscola->id,
+                                          verticeEscola->ProfessorRequisitado1->id);
             printf("Escola %d - Habilitações Mín[0]. \n", verticeEscola->id);
             
             auxArestaEscola = verticeEscola->ArestaParaProfessor1;            
@@ -628,7 +629,7 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
             }
             */
             
-            printf("Vértice %d - Habilitação %d - Preferência de escola: %d %d %d %d - priorid %d %d %d %d \n\n", verticeProfessor->id, 
+            printf("Vértice %02d - Habilitação %d - Preferência de escola: %0d %0d %0d %0d - priorid %d %d %d %d \n", verticeProfessor->id, 
                                                                     verticeProfessor->habilitacao, 
                                                                     verticeProfessor->ArestaParaEscola->atalho->id,
                                                                     verticeProfessor->ArestaParaEscola->prox->atalho->id,
@@ -639,8 +640,8 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
                                                                     verticeProfessor->ArestaParaEscola->prox->prox->prioridade,
                                                                     verticeProfessor->ArestaParaEscola->prox->prox->prox->prioridade);
             
-            printf("Prof %d Escola - %d", verticeProfessor->id,
-                                          verticeProfessor->escolaQueORecebeu->id);
+            // printf("Prof %d Escola -", verticeProfessor->id,
+                                        //   verticeProfessor->escolaQueORecebeu->id);
 
             verticeProfessor = verticeProfessor->prox;
         }
@@ -1279,6 +1280,9 @@ void matchEstavel(){
         }
         if(auxArestaEscola->atalho->ProfessorRequisitado1 == NULL){
             auxArestaEscola->atalho->ProfessorRequisitado1 = auxVerticeProfessor;
+            auxVerticeProfessor->escolaQueORecebeu = auxArestaEscola->atalho;
+            
+            auxVerticeProfessor = auxVerticeProfessor->prox;
         }
         else{
            if((auxArestaEscola->atalho->ProfessorRequisitado1->habilitacao - 
@@ -1287,12 +1291,19 @@ void matchEstavel(){
                auxArestaEscola->atalho->ProfessorRequisitado1->escolaQueORecebeu = NULL;
                auxArestaEscola->atalho->ProfessorRequisitado1 = auxVerticeProfessor;
                auxVerticeProfessor->escolaQueORecebeu = auxArestaEscola->atalho;
+               i=0;
+               auxVerticeProfessor = grafo->verticeProfessor;
            }
+           else{
+               auxVerticeProfessor = auxVerticeProfessor->prox;
+           }
+           
+        
         }
             // printf("tem que fazer pra segunda vaga também");
         }
 
-        }
+}
 
 // Funcao principal do programa
 int main() {
