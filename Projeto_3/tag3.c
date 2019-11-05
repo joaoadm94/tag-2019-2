@@ -1284,27 +1284,37 @@ void matchEstavel(){
             auxVerticeProfessor = auxVerticeProfessor->prox;
             continue;
         }
+        // Percorre enquanto houver escolas
+        percorrer = true;
         auxArestaProfessor = auxVerticeProfessor->ArestaParaEscola;
-        escolaProposta = auxArestaProfessor->atalho;
+        while (percorrer){
+            escolaProposta = auxArestaProfessor->atalho;
 
-        // Se escola nao esta emparelhada, realizar emparelhamento
-        if (escolaProposta->emparelhado == 0) {
-            if (escolaProposta->habilitacoesMinimas[0] <= auxVerticeProfessor->habilitacao) {
-                auxVerticeProfessor->escolaQueORecebeu = escolaProposta;
-                escolaProposta->ProfessorRequisitado1 = auxVerticeProfessor;
-                escolaProposta->prioridadeAtual[0] = encontrarPrioridadeEscola(auxVerticeProfessor->id, escolaProposta->ArestaParaProfessor1);
-                escolaProposta->emparelhado = 1;
-            }
-        } else {
-            // Se escola esta emparelhada, comparar com a prioridade da nova proposta
-            if (escolaProposta->emparelhado = 1) {
-                prioridadeProposta = encontrarPrioridadeEscola(auxVerticeProfessor->id, escolaProposta->ArestaParaProfessor1);
-                if (prioridadeProposta > escolaProposta->prioridadeAtual[0]) {
-                    prioridadeAtual[0] = prioridadeProposta;
-                    escolaProposta->ProfessorRequisitado1->escolaQueORecebeu = NULL;
+            // Se escola nao esta emparelhada, realizar emparelhamento
+            if (escolaProposta->emparelhado == 0) {
+                if (escolaProposta->habilitacoesMinimas[0] <= auxVerticeProfessor->habilitacao) {
+                    auxVerticeProfessor->escolaQueORecebeu = escolaProposta;
                     escolaProposta->ProfessorRequisitado1 = auxVerticeProfessor;
-
+                    escolaProposta->prioridadeAtual[0] = encontrarPrioridadeEscola(auxVerticeProfessor->id, escolaProposta->ArestaParaProfessor1);
+                    escolaProposta->emparelhado = 1;
+                    break;
                 }
+            } else {
+                // Se escola esta emparelhada, comparar com a prioridade da nova proposta
+                if (escolaProposta->emparelhado = 1) {
+                    prioridadeProposta = encontrarPrioridadeEscola(auxVerticeProfessor->id, escolaProposta->ArestaParaProfessor1);
+                    if (prioridadeProposta > escolaProposta->prioridadeAtual[0]) {
+                        prioridadeAtual[0] = prioridadeProposta;
+                        escolaProposta->ProfessorRequisitado1->escolaQueORecebeu = NULL;
+                        escolaProposta->ProfessorRequisitado1 = auxVerticeProfessor;
+                        break;
+                    }
+                }
+            }
+            if (auxArestaProfessor->prox == NULL) {
+                percorrer = false;
+            } else {
+                auxArestaProfessor = auxArestaProfessor->prox;    
             }
         }
         
