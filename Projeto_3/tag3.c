@@ -401,7 +401,7 @@ int lerGrafo(FILE *arquivo) {
                 grafo->verticeEscola->habilitacoesMinimas[1] = habilitacaoMinimaExigida[1];
         }
     }
-        
+
     inserirArestaEscola(grafo->verticeEscola, 0);
     if(habilitacaoMinimaExigida[1]){
         inserirArestaEscola(grafo->verticeEscola, 1);
@@ -611,6 +611,7 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
         printf("Grafo vazio!\n");
     } else {
         // laço para percorrer os vértices
+        printf(">>> PROFESSORES \n\n");
         while (verticeProfessor) {
             /*
             if (verticeProfessor->ArestaParaProfessor != NULL) {
@@ -629,7 +630,7 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
             }
             */
             
-            printf("Vértice %02d - Habilitação %d - Preferência de escola: %0d %0d %0d %0d - priorid %d %d %d %d \n", verticeProfessor->id, 
+            printf("Vértice %02d - Habilitação %d - Preferência de escola: %02d %02d %02d %02d - respecitiva prioridade %d %d %d %d \n", verticeProfessor->id, 
                                                                     verticeProfessor->habilitacao, 
                                                                     verticeProfessor->ArestaParaEscola->atalho->id,
                                                                     verticeProfessor->ArestaParaEscola->prox->atalho->id,
