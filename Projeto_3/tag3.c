@@ -37,6 +37,7 @@ typedef struct verticeEscola {
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];         // referencia p/ o nome do vértice
+    int prioridadeAtual[2];    // prioridade da escola do emparelhamento existente
     verticeProfessor *ProfessorRequisitado1;
     verticeProfessor *ProfessorRequisitado2;
     tArestaEscola *ArestaParaProfessor1;  // referencia p/ a lista de arestas das opções de professores
@@ -1239,10 +1240,32 @@ void passaSegundoCaminhoCriticoParaArquivoVisual(){
 }
 */
 
+int encontrarPrioridadeEscola(int terminal, tVerticeEscola * arestaEscola) {
+    tArestaEscola * auxArestaEscola = arestaEscola;
+    bool percorrer = true;
+    int prioridade = 0;
+
+    while (percorrer) {
+        // Procura a aresta da escola que aponta para o professor proponente
+        if (auxArestaEscola->terminal == terminal) {
+            prioridade = auxArestaEscola->prioridade;
+            percorrer = false;
+        }
+        auxArestaEscola = auxArestaEscola->prox;
+    } 
+
+    return prioridade;
+} 
+
 void matchEstavel(){
-    int i, x;
+    int i, x, prioridadeProposta;
+    bool percorrer;
     tVerticeEscola * auxVerticeEscola = grafo->verticeEscola;
+    tVerticeEscola * escolaProposta;
     tVerticeProfessor * auxVerticeProfessor = grafo->verticeProfessor;
+    tArestaProfessor * auxArestaProfessor;
+    tArestaEscola * auxArestaEscola;
+
 
     for(i=0; i<grafo->qtdEscolas; ++i){
         auxVerticeEscola->ProfessorRequisitado1 = NULL;
@@ -1261,14 +1284,36 @@ void matchEstavel(){
             auxVerticeProfessor = auxVerticeProfessor->prox;
             continue;
         }
-        
+        auxArestaProfessor = auxVerticeProfessor->ArestaParaEscola;
+        escolaProposta = auxArestaProfessor->atalho;
+
+        // Se escola nao esta emparelhada, realizar emparelhamento
+        if (escolaProposta->emparelhado == 0) {
+            if (escolaProposta->habilitacoesMinimas[0] <= auxVerticeProfessor->habilitacao) {
+                auxVerticeProfessor->escolaQueORecebeu = escolaProposta;
+                escolaProposta->ProfessorRequisitado1 = auxVerticeProfessor;
+                escolaProposta->prioridadeAtual[0] = encontrarPrioridadeEscola(auxVerticeProfessor->id, escolaProposta->ArestaParaProfessor1);
+                escolaProposta->emparelhado = 1;
+            }
+        } else {
+            // Se escola esta emparelhada, comparar com a prioridade da nova proposta
+            if (escolaProposta->emparelhado = 1) {
+                prioridadeProposta = encontrarPrioridadeEscola(auxVerticeProfessor->id, escolaProposta->ArestaParaProfessor1);
+                if (prioridadeProposta > escolaProposta->prioridadeAtual[0]) {
+                    prioridadeAtual[0] = prioridadeProposta;
+                    escolaProposta->ProfessorRequisitado1->escolaQueORecebeu = NULL;
+                    escolaProposta->ProfessorRequisitado1 = auxVerticeProfessor;
+
+                }
+            }
+        }
         
         
         if(auxVerticeProfessor->ArestaParaEscola->atalho->habilitacoesMinimas[0] <= auxVerticeProfessor->habilitacao){
             printf("tem que fazer pra segunda vaga também");
         }
 
-        }
+    }
 }
 
 // Funcao principal do programa
