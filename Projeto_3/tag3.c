@@ -552,6 +552,7 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
         printf("Grafo vazio!\n");
     } else {
         // laço para percorrer os vértices
+        printf("\n\n\n>>> ESCOLAS \n\n");
         while (flagVertice) {
             
             
@@ -572,21 +573,24 @@ void imprimirVerticesEscola(tVerticeEscola *verticeEscola) {
             
             // verticeEscola->grau = grau;
             if(verticeEscola->ProfessorRequisitado1)
-                printf("Escola %d Professor %d-", verticeEscola->id,
+                printf("> ESCOLA %d - Professor Escolhido: %d ", verticeEscola->id,
                                           verticeEscola->ProfessorRequisitado1->id);
-            printf("Escola %d - Habilitações Mín[0]. \n", verticeEscola->id);
+            else{
+                printf("> ESCOLA %d ", verticeEscola->id);
+            }    
+            printf("\nHabilitações Mínimas[0] :\n");
             
             auxArestaEscola = verticeEscola->ArestaParaProfessor1;            
             while(auxArestaEscola != NULL){ 
-                printf("%d prior: %d -", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
+                printf("%d ", auxArestaEscola->atalho->id);
                 auxArestaEscola = auxArestaEscola->prox;
             }
                 printf("\n");
             if(verticeEscola->habilitacoesMinimas[1] > 0){
-                printf("Mín[1]: ");    
+                printf("Habilitações Mínimas[1] : \n");    
                 auxArestaEscola = verticeEscola->ArestaParaProfessor2;            
                 while(auxArestaEscola != NULL){                      
-                    printf("%d prior: %d -", auxArestaEscola->atalho->id, auxArestaEscola->prioridade);
+                    printf("%d ", auxArestaEscola->atalho->id);
                     auxArestaEscola = auxArestaEscola->prox;
                 }
                 printf("\n");
@@ -630,7 +634,7 @@ void imprimirVerticesProfessores(tVerticeProfessor *verticeProfessor) {
             }
             */
             
-            printf("Vértice %02d - Habilitação %d - Preferência de escola: %02d %02d %02d %02d - respecitiva prioridade %d %d %d %d \n", verticeProfessor->id, 
+            printf("Professor %02d - Habilitação %d - Preferência de escola: %02d %02d %02d %02d - respecitiva prioridade %d %d %d %d \n", verticeProfessor->id, 
                                                                     verticeProfessor->habilitacao, 
                                                                     verticeProfessor->ArestaParaEscola->atalho->id,
                                                                     verticeProfessor->ArestaParaEscola->prox->atalho->id,
