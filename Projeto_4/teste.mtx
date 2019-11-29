@@ -1,0 +1,25 @@
+% Teoria e Aplicacao de Grafos - 2019/2
+% Grafo orientado que representa o curriculo do curso de Ciencia
+% da Computacao da Universidade de Brasilia.
+% Primeira linha: 
+%    possui 4 numeros:
+%       1 - qtd de vertices
+%       2 - qtd de arestas
+%       3 - grafo com rotulos (0 - nao, 1 - sim)
+%       4 - grafo direcionado (0 - nao, 1 - sim)
+%----------------------------------------------------------------
+6 8 1 1 
+1 "A" 6
+2 "B" 4
+3 "C" 6
+4 "D" 2
+5 "E" 4
+6 "F" 4
+1 2
+1 3
+2 4
+3 4
+3 5
+4 6
+5 4
+5 6
