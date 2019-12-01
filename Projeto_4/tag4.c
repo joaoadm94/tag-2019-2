@@ -10,7 +10,7 @@
 
 // ----------------- Definições de tipos -------------------
 typedef struct vertice vertice;
-typedef struct aresta{
+typedef struct aresta {
     int terminal;       // índice do vértice terminal
     int peso;           // peso ou valor da aresta, 0 = peso padrão
     int visitado;
@@ -25,7 +25,8 @@ typedef struct vertice {
     double coeficiente; // coeficiente de aglomeracao do vertice
     int peso;           // peso associado as arestas que saem do vertice
     char nome[10];      // referencia p/ o nome do vértice
-    int visitado;       //
+    int visitado;       // marcador de visita, para fins de algoritmo de busca
+    int cor;       // -1 se nao tiver sido colorido, outro numero qualquer para a cor
     tAresta *grafoAresta;    // referencia p/ a lista de arestas (grafo)
     struct vertice *prox;     // referencia p/ o proximo vertice
 } tVertice;
@@ -69,7 +70,6 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
     }
 
     if (!rotulado) {
-        printf("n rotulado");
         if (qtdVertices > 0) {
             auxVertice = (tVertice*)malloc(sizeof(tVertice));
             if (auxVertice) {
@@ -79,6 +79,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
                 auxVertice->grau = 0;
                 auxVertice->grauEntrada = 0;
                 auxVertice->visitado = 0;
+                auxVertice->cor = -1;
                 grafo->vertice = auxVertice;
             } else {
                 printf("Não foi possível alocar memória para o vértice. Encerrando...");
@@ -93,6 +94,7 @@ int inicializarGrafo(int qtdVertices, int qtdArestas, int direcionado, int rotul
                     vertice->grau = 0;
                     vertice->grauEntrada = 0;
                     vertice->visitado = 0;
+                    vertice->cor = -1;
                     auxVertice->prox = vertice;
                     auxVertice = vertice;    
                 } else {
@@ -118,6 +120,7 @@ tVertice* inserirVerticeRotulado(tVertice *anterior, int id, char rotulo[], int 
         vertice->prox = NULL;
         vertice->peso = peso;
         vertice->visitado = 0;
+        vertice->cor = -1;
     } else {
         printf("Não foi possível alocar memória para o vértice. Encerrando...");
         return NULL;
@@ -221,7 +224,6 @@ int lerGrafo(FILE *arquivo) {
             qtdVertices--;
         }
     }
-    imprimirVertices(grafo->vertice);
 
     while (fgets(linha, 100, arquivo)) {
         sscanf(linha, "%d %d", &origem, &destino);
@@ -500,6 +502,72 @@ int converteGrafoParaArquivoVisual(){
     return system(comando);
 }
 
+tVertice* encontrarMaiorGrau() {
+    tVertice *vertice, *verticeMaiorGrau;
+
+    printf("here\n");
+    vertice = grafo->vertice;
+    while(vertice->cor != (-1)) {
+        if (vertice->prox != NULL) {
+            vertice = vertice->prox;
+        } else {
+            break;
+        }
+    }
+    verticeMaiorGrau = vertice;
+    while (vertice != NULL) {
+        if (vertice->cor == (-1) && vertice->grau > verticeMaiorGrau->grau) {
+            verticeMaiorGrau = vertice;
+        }
+        vertice = vertice->prox;
+    }
+
+    
+    if (verticeMaiorGrau->cor != (-1)) {
+        return NULL;
+    }
+
+    return verticeMaiorGrau;
+}
+
+void colorirVertice (tVertice *vertice) {
+    tVertice *verticeAux;
+    tAresta *aresta;
+    int cores[10];
+
+    for (int i = 0; i < 10; i++) {
+        cores[i] = 0;
+    }
+
+    aresta = vertice->grafoAresta;
+
+    while (aresta != NULL) {
+        verticeAux = aresta->atalho;
+        if (verticeAux->cor != 0) { 
+            cores[verticeAux->cor] = 1;
+        }
+        aresta = aresta->prox;
+    }
+
+    for (int i = 0; i < 10; i++) {
+        if (cores[i] == 0) {
+            vertice->cor = i;
+            break;
+        }
+    }
+}
+
+void colorirGrafo() {
+    tVertice *vertice;
+
+    vertice = encontrarMaiorGrau();
+    while (vertice != NULL) {
+        printf("%d\n", vertice->id);
+        colorirVertice(vertice);
+        vertice = encontrarMaiorGrau();
+    }
+}
+
 // Funcao principal do programa
 int main() {
     printf("------ Teoria e Aplicação de Grafos - Projeto 4 ------\n");
@@ -507,10 +575,12 @@ int main() {
     printf("---- Hiago dos Santos Rabelo (16/0124492) ----\n\n");
     lerArquivo();
     imprimirVertices(grafo->vertice);
-    if(converteGrafoParaArquivoVisual()){
+    colorirGrafo();
+    /**if(converteGrafoParaArquivoVisual()){
         printf("Não foi possível passar o grafo para o arquivo visual\n");
         return EXIT_FAILURE;
     }
+    **/
     // achaVerticesComMaiorCustoDeChegadaEInsereNaStruct();
     // printf(">> Caminhos críticos: \n");
     // printf("Maior: %s\n", maiorESegundoMaiorCaminho.Maior->nome);
